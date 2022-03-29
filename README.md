@@ -12,9 +12,9 @@ We already learned the hexagonal architecture with its four layers, being:
 * Application Layer
 * Domain Layer
 * Infrastructure Layer
+While this separation of layers is very helpful for coupling, cohesion and defining your core domain, it has some drawbacks. 
 
 #### Good Use 
-While this separation of layers is very helpful for coupling, cohesion and defining your core domain, it has some drawbacks. 
 Create Example: Think about a 4-layer hotel reservation system. Whenever you want to create a booking, you have to walk through all of the layers. 
 - You send a request to the presentation layer 
 - -> the presentation layer calls the use case on application layer 
