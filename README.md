@@ -49,4 +49,4 @@ Therefore we separate our _write_ and our _read_ actions. To do so, we want to a
 With the rise of the agile manifesto, we also want to have a flexible way of persisting our data. In combination with CQRS it can be used to _Project_ our Domain (_Write_) Database to our Denormalized (_Read_) Database. This can be done, by publishing Events to a **Service Bus**. This Bus acts as a Event Storage (And Log) and the subscribers in the _Projection_ Layer get triggered to modify the Denormalized Database. In the sense of DDD, this ensures **Eventual Consistency** and decouples Aggregates and Bounded Contexts.
 
 <img src="https://user-images.githubusercontent.com/86053522/160591339-f383a5eb-b910-4c63-b06e-43372fb22dc6.png" width="400" height="400" />
->A system using CQRS and ES architecture example
+> A system using CQRS and ES architecture example
