@@ -18,10 +18,10 @@ public class BookingListRepository implements BookingRepository {
     }
 
     @Override
-    public void cancelBooking(UUID bookingId) {
+    public void cancelBooking(UUID bookingId) throws IllegalArgumentException{
         bookings.stream()
                 .filter(b -> b.getBookingId().equals(bookingId))
                 .findFirst()
-                .ifPresent(bookings::remove);
+                .ifPresentOrElse(bookings::remove, () -> {throw new IllegalArgumentException("booking with id " + bookingId + " not found");});
     }
 }
