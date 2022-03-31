@@ -8,5 +8,5 @@ public interface BookingRepository {
 
     void createBooking(Booking booking);
 
-    void cancelBooking(UUID bookingId);
+    void cancelBooking(UUID bookingId) throws IllegalArgumentException;
 }
