@@ -1,6 +1,6 @@
 package eventside.rest;
 
-import eventside.EventRepository;
+import eventside.infrastructure.EventRepository;
 import eventside.event.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,4 +20,6 @@ public class EventRestController {
         System.out.println("Event received: " + event);
         return true;
     }
+
+
 }

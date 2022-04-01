@@ -1,13 +1,13 @@
 package writeside.application;
 
+import eventside.event.BookingCreatedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import writeside.domain.model.Booking;
-import writeside.domain.model.Customer;
 import writeside.domain.repository.BookingRepository;
 import writeside.domain.repository.CustomerRepository;
 import writeside.domain.repository.RoomRepository;
+import writeside.domain.repository.WriteSideEventPublisher;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -23,6 +23,9 @@ public class BookingServiceImpl implements BookingService{
 
     @Autowired
     private RoomRepository roomRepository;
+
+    @Autowired
+    private WriteSideEventPublisher writeSideEventPublisher;
 
     @Override
     public boolean book(String scnr, List<String> rooms, LocalDate arrivalDate, LocalDate departureDate) {
@@ -50,6 +53,14 @@ public class BookingServiceImpl implements BookingService{
 
         // Add to Booking list
         bookingRepository.createBooking(booking);
+        BookingCreatedEvent event = new BookingCreatedEvent(
+                booking.getBookingId(),
+                booking.getArrivalDate(),
+                booking.getDepartureDate(),
+                booking.getRooms(),
+                booking.getCustomer()
+        );
+        writeSideEventPublisher.publishBookingCreatedEvent(event);
 
         return true;
     }
