@@ -1,9 +1,11 @@
 package writeside.application;
 
+import eventside.event.BookingCanceledEvent;
 import eventside.event.BookingCreatedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import writeside.domain.model.Booking;
+import writeside.domain.model.Room;
 import writeside.domain.repository.BookingRepository;
 import writeside.domain.repository.CustomerRepository;
 import writeside.domain.repository.RoomRepository;
@@ -11,6 +13,8 @@ import writeside.domain.repository.WriteSideEventPublisher;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @Service
 public class BookingServiceImpl implements BookingService{
@@ -67,12 +71,24 @@ public class BookingServiceImpl implements BookingService{
 
     @Override
     public boolean cancel(UUID bookingId) {
-        try {
+        AtomicBoolean bookingIsPresent = new AtomicBoolean(false);
+
+        bookingRepository.bookingById(bookingId).ifPresent( booking -> {
             bookingRepository.cancelBooking(bookingId);
-            return true;
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
+            BookingCanceledEvent event = new BookingCanceledEvent(
+                     bookingId,
+                     booking.getArrivalDate(),
+                     booking.getDepartureDate(),
+                     booking.getRooms()
+                             .stream()
+                             .map(roomRepository::getRoom)
+                             .map(Optional::get)
+                             .collect(Collectors.toMap(Room::getRoomNumber, Room::getNumberOfBeds))
+            );
+            writeSideEventPublisher.publishBookingCanceledEvent(event);
+            bookingIsPresent.set(true);
+        });
+
+        return bookingIsPresent.get();
     }
 }

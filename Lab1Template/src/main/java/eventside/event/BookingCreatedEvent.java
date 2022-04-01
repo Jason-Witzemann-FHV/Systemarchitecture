@@ -1,10 +1,10 @@
 package eventside.event;
 
 import java.time.LocalDate;
-import java.util.Set;
 import java.util.UUID;
+import java.util.Set;
 
-public class BookingCreatedEvent {
+public class BookingCreatedEvent extends Event {
 
     private final UUID bookingId;
     private final LocalDate arrivalDate;

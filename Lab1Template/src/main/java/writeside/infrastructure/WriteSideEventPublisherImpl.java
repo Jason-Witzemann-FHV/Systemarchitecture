@@ -18,7 +18,7 @@ public class WriteSideEventPublisherImpl implements WriteSideEventPublisher {
         System.out.println("Event published: " + event);
         return localApiClient
                 .post()
-                .uri("/event/")
+                .uri("/createBooking/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(Mono.just(event), BookingCreatedEvent.class)
@@ -32,7 +32,7 @@ public class WriteSideEventPublisherImpl implements WriteSideEventPublisher {
         System.out.println("Event published: " + event);
         return localApiClient
                 .post()
-                .uri("/event/")
+                .uri("/cancelBooking/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(Mono.just(event), BookingCanceledEvent.class)

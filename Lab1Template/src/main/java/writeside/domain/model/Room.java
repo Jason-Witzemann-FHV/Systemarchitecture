@@ -3,11 +3,11 @@ package writeside.domain.model;
 public class Room {
 
     private String roomNumber;
-    private int numberOfRooms;
+    private int numberOfBeds;
 
-    public Room(String roomNumber, int numberOfRooms) {
+    public Room(String roomNumber, int numberOfBeds) {
         this.roomNumber = roomNumber;
-        this.numberOfRooms = numberOfRooms;
+        this.numberOfBeds = numberOfBeds;
     }
 
     public String getRoomNumber() {
@@ -18,19 +18,19 @@ public class Room {
         this.roomNumber = roomNumber;
     }
 
-    public int getNumberOfRooms() {
-        return numberOfRooms;
+    public int getNumberOfBeds() {
+        return numberOfBeds;
     }
 
-    public void setNumberOfRooms(int numberOfRooms) {
-        this.numberOfRooms = numberOfRooms;
+    public void setNumberOfBeds(int numberOfBeds) {
+        this.numberOfBeds = numberOfBeds;
     }
 
     @Override
     public String toString() {
         return "Room{" +
                 "roomNumber='" + roomNumber + '\'' +
-                ", numberOfRooms=" + numberOfRooms +
+                ", numberOfBeds=" + numberOfBeds +
                 '}';
     }
 }

@@ -6,6 +6,7 @@ import writeside.domain.repository.BookingRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -23,5 +24,10 @@ public class BookingListRepository implements BookingRepository {
                 .filter(b -> b.getBookingId().equals(bookingId))
                 .findFirst()
                 .ifPresentOrElse(bookings::remove, () -> {throw new IllegalArgumentException("booking with id " + bookingId + " not found");});
+    }
+
+    @Override
+    public Optional<Booking> bookingById(UUID bookingId) {
+        return bookings.stream().filter(b -> b.getBookingId().equals(bookingId)).findFirst();
     }
 }
