@@ -16,16 +16,16 @@ public class FreeRoomRepository implements FreeRoomRepositoryInterface{
 
 
     public FreeRoomRepository() {
-        freeRooms.add(new FreeRoom("S_001", 1, LocalDate.of(2022,1,1), LocalDate.of(2022,12,31)));
-        freeRooms.add(new FreeRoom("S_002", 1, LocalDate.of(2022,1,1), LocalDate.of(2022,12,31)));
-        freeRooms.add(new FreeRoom("S_003", 1, LocalDate.of(2022,1,1), LocalDate.of(2022,12,31)));
-        freeRooms.add(new FreeRoom("S_004", 1, LocalDate.of(2022,1,1), LocalDate.of(2022,12,31)));
-        freeRooms.add(new FreeRoom("S_005", 1, LocalDate.of(2022,1,1), LocalDate.of(2022,12,31)));
-        freeRooms.add(new FreeRoom("D_001", 2, LocalDate.of(2022,1,1), LocalDate.of(2022,12,31)));
-        freeRooms.add(new FreeRoom("D_002", 2, LocalDate.of(2022,1,1), LocalDate.of(2022,12,31)));
-        freeRooms.add(new FreeRoom("D_003", 2, LocalDate.of(2022,1,1), LocalDate.of(2022,12,31)));
-        freeRooms.add(new FreeRoom("D_004", 2, LocalDate.of(2022,1,1), LocalDate.of(2022,12,31)));
-        freeRooms.add(new FreeRoom("D_005", 2, LocalDate.of(2022,1,1), LocalDate.of(2022,12,31)));
+        freeRooms.add(new FreeRoom("S_001", 1, LocalDate.MIN, LocalDate.MAX));
+        freeRooms.add(new FreeRoom("S_002", 1, LocalDate.MIN, LocalDate.MAX));
+        freeRooms.add(new FreeRoom("S_003", 1, LocalDate.MIN, LocalDate.MAX));
+        freeRooms.add(new FreeRoom("S_004", 1, LocalDate.MIN, LocalDate.MAX));
+        freeRooms.add(new FreeRoom("S_005", 1, LocalDate.MIN, LocalDate.MAX));
+        freeRooms.add(new FreeRoom("D_001", 2, LocalDate.MIN, LocalDate.MAX));
+        freeRooms.add(new FreeRoom("D_002", 2, LocalDate.MIN, LocalDate.MAX));
+        freeRooms.add(new FreeRoom("D_003", 2, LocalDate.MIN, LocalDate.MAX));
+        freeRooms.add(new FreeRoom("D_004", 2, LocalDate.MIN, LocalDate.MAX));
+        freeRooms.add(new FreeRoom("D_005", 2, LocalDate.MIN, LocalDate.MAX));
     }
 
     public List<FreeRoom> getBetween(LocalDate from, LocalDate to) {
