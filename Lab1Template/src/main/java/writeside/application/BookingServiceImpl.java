@@ -5,6 +5,7 @@ import eventside.event.BookingCreatedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import writeside.domain.model.Booking;
+import writeside.domain.model.Customer;
 import writeside.domain.model.Room;
 import writeside.domain.repository.BookingRepository;
 import writeside.domain.repository.CustomerRepository;
@@ -37,8 +38,9 @@ public class BookingServiceImpl implements BookingService{
         Set<String> roomSet = new HashSet<>(rooms);
 
         // Validate Data
+        Customer customer = null;
         try {
-            customerRepository.getCustomer(scnr).orElseThrow(() -> new IllegalArgumentException("customer for id " + scnr + " not found"));
+            customer = customerRepository.getCustomer(scnr).orElseThrow(() -> new IllegalArgumentException("customer for id " + scnr + " not found"));
             roomSet.forEach(r -> roomRepository.getRoom(r).orElseThrow(() -> new IllegalArgumentException("room with nr " + r + " not found")));
             if (departureDate.isBefore(arrivalDate) || departureDate.isEqual(arrivalDate)) throw new IllegalArgumentException("Arrival and Departure date not valid");
         } catch (IllegalArgumentException e) {
@@ -62,7 +64,7 @@ public class BookingServiceImpl implements BookingService{
                 booking.getArrivalDate(),
                 booking.getDepartureDate(),
                 booking.getRooms(),
-                booking.getCustomer()
+                customer.getName()
         );
         writeSideEventPublisher.publishBookingCreatedEvent(event);
 

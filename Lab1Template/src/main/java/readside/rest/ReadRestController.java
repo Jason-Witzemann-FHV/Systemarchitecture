@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import readside.dto.BookedStay;
 import readside.dto.FreeRoom;
 import readside.infrastructure.BookingRepositoryInterface;
-import readside.infrastructure.FreeRoomRepository;
 import readside.infrastructure.FreeRoomRepositoryInterface;
 import readside.projection.IProjection;
 
@@ -17,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:8080"})
 public class ReadRestController {
 
     @Autowired // Todo autowire interface
