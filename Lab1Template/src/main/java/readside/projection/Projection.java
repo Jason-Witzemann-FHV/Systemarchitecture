@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class Projection implements IProjection{
@@ -68,9 +69,11 @@ public class Projection implements IProjection{
 
         bookingRepository.bookingById(event.getBookingId()).ifPresent(bookingRepository::cancelBooking);
 
-
-        List<FreeRoom> edgeCases = freeRoomRepository.getBetween(event.getArrivalDate(), event.getDepartureDate())
-                .stream()
+        List<FreeRoom> edgeCases = Stream.concat(
+                        freeRoomRepository.getBetween(event.getArrivalDate(), event.getArrivalDate())
+                                .stream(),
+                        freeRoomRepository.getBetween(event.getDepartureDate(), event.getDepartureDate())
+                                .stream())
                 .filter(r -> event.getRooms().containsKey(r.getRoomnumber()))
                 .collect(Collectors.toList());
 
@@ -98,10 +101,10 @@ public class Projection implements IProjection{
                                         .getFrom().toEpochDay())),
                                 LocalDate.ofEpochDay(Math.max(event.getDepartureDate()
                                         .toEpochDay(), tempList.stream()
-                                        .max(Comparator.comparing(FreeRoom::getFrom))
+                                        .max(Comparator.comparing(FreeRoom::getTo))
                                         .get()
-                                        .getFrom().toEpochDay()))
-                                ));
+                                        .getTo().toEpochDay()))
+                        ));
                         tempList.forEach(r -> freeRoomRepository.unfree(r));
                     }
                 });
