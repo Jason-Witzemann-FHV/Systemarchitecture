@@ -34,14 +34,14 @@ public class WriteRestController {
         LocalDate departureDate = LocalDate.parse(departureDateString, DateTimeFormatter.ISO_DATE);
         List<String> rooms = Arrays.stream(roomsArray).collect(Collectors.toList());
 
-        BookRoomsCommand bookRooms = new BookRoomsCommand(
+        BookRoomsCommand bookRoomsCommand = new BookRoomsCommand(
                 scnr,
                 rooms,
                 arrivalDate,
                 departureDate
         );
 
-        bookingService.book(bookRooms);
+        bookingService.book(bookRoomsCommand);
         return true;
     }
 
@@ -50,8 +50,8 @@ public class WriteRestController {
      */
     @PostMapping(value = "/cancelBooking")
     public boolean cancelBooking(@RequestParam String bookingIdString) {
-        CancelRoomCommand cancelRoom = new CancelRoomCommand(UUID.fromString(bookingIdString));
-        bookingService.cancel(cancelRoom);
+        CancelRoomCommand cancelRoomCommand = new CancelRoomCommand(UUID.fromString(bookingIdString));
+        bookingService.cancel(cancelRoomCommand);
         return true;
     }
 
