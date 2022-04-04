@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import writeside.application.BookingService;
+import writeside.application.command.BookRoomsCommand;
+import writeside.application.command.CancelRoomCommand;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -31,8 +33,15 @@ public class WriteRestController {
         LocalDate arrivalDate = LocalDate.parse(arrivalDateString, DateTimeFormatter.ISO_DATE);
         LocalDate departureDate = LocalDate.parse(departureDateString, DateTimeFormatter.ISO_DATE);
         List<String> rooms = Arrays.stream(roomsArray).collect(Collectors.toList());
-        // Todo Validation of input??
-        bookingService.book(scnr, rooms, arrivalDate, departureDate);
+
+        BookRoomsCommand bookRooms = new BookRoomsCommand(
+                scnr,
+                rooms,
+                arrivalDate,
+                departureDate
+        );
+
+        bookingService.book(bookRooms);
         return true;
     }
 
@@ -41,8 +50,8 @@ public class WriteRestController {
      */
     @PostMapping(value = "/cancelBooking")
     public boolean cancelBooking(@RequestParam String bookingIdString) {
-        UUID bookingId = UUID.fromString(bookingIdString);
-        bookingService.cancel(bookingId);
+        CancelRoomCommand cancelRoom = new CancelRoomCommand(UUID.fromString(bookingIdString));
+        bookingService.cancel(cancelRoom);
         return true;
     }
 

@@ -4,6 +4,8 @@ import eventside.event.BookingCanceledEvent;
 import eventside.event.BookingCreatedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import writeside.application.command.BookRoomsCommand;
+import writeside.application.command.CancelRoomCommand;
 import writeside.domain.model.Booking;
 import writeside.domain.model.Room;
 import writeside.domain.repository.BookingRepository;
@@ -32,15 +34,15 @@ public class BookingServiceImpl implements BookingService{
     private WriteSideEventPublisher writeSideEventPublisher;
 
     @Override
-    public boolean book(String scnr, List<String> rooms, LocalDate arrivalDate, LocalDate departureDate) {
+    public boolean book(BookRoomsCommand bookRooms) {
 
-        Set<String> roomSet = new HashSet<>(rooms);
+        Set<String> roomSet = new HashSet<>(bookRooms.getRooms());
 
         // Validate Data
         try {
-            customerRepository.getCustomer(scnr).orElseThrow(() -> new IllegalArgumentException("customer for id " + scnr + " not found"));
+            customerRepository.getCustomer(bookRooms.getSocialSecurityNumber()).orElseThrow(() -> new IllegalArgumentException("customer for id " + bookRooms.getSocialSecurityNumber() + " not found"));
             roomSet.forEach(r -> roomRepository.getRoom(r).orElseThrow(() -> new IllegalArgumentException("room with nr " + r + " not found")));
-            if (departureDate.isBefore(arrivalDate) || departureDate.isEqual(arrivalDate)) throw new IllegalArgumentException("Arrival and Departure date not valid");
+            if (!bookRooms.getDepartureDate().isAfter(bookRooms.getArrivalDate())) throw new IllegalArgumentException("Arrival and Departure date not valid");
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
             return false;
@@ -49,10 +51,10 @@ public class BookingServiceImpl implements BookingService{
         // Create Domain Object
         Booking booking = new Booking(
                 UUID.randomUUID(),
-                arrivalDate,
-                departureDate,
+                bookRooms.getArrivalDate(),
+                bookRooms.getDepartureDate(),
                 roomSet,
-                scnr
+                bookRooms.getSocialSecurityNumber()
         );
 
         // Add to Booking list
@@ -70,13 +72,13 @@ public class BookingServiceImpl implements BookingService{
     }
 
     @Override
-    public boolean cancel(UUID bookingId) {
+    public boolean cancel(CancelRoomCommand cancelRoom) {
         AtomicBoolean bookingIsPresent = new AtomicBoolean(false);
 
-        bookingRepository.bookingById(bookingId).ifPresent( booking -> {
-            bookingRepository.cancelBooking(bookingId);
+        bookingRepository.bookingById(cancelRoom.getBookingId()).ifPresent( booking -> {
+            bookingRepository.cancelBooking(cancelRoom.getBookingId());
             BookingCanceledEvent event = new BookingCanceledEvent(
-                     bookingId,
+                     cancelRoom.getBookingId(),
                      booking.getArrivalDate(),
                      booking.getDepartureDate(),
                      booking.getRooms()
