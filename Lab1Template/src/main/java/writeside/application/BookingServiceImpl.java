@@ -42,7 +42,7 @@ public class BookingServiceImpl implements BookingService{
         // Validate Data
         Customer customer = null;
         try {
-            customer = customerRepository.getCustomer(bookRooms.getSocialSecurityNumber()).orElseThrow(() -> new IllegalArgumentException("customer for id " + scnr + " not found"));
+            customer = customerRepository.getCustomer(bookRooms.getSocialSecurityNumber()).orElseThrow(() -> new IllegalArgumentException("customer for id " + bookRooms.getSocialSecurityNumber() + " not found"));
             roomSet.forEach(r -> roomRepository.getRoom(r).orElseThrow(() -> new IllegalArgumentException("room with nr " + r + " not found")));
             if (!bookRooms.getDepartureDate().isAfter(bookRooms.getArrivalDate())) throw new IllegalArgumentException("Arrival and Departure date not valid");
         } catch (IllegalArgumentException e) {
