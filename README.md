@@ -111,13 +111,13 @@ The `Write` side is responsible for modifying the core domain. On successful use
 3. The `WriteRestController` calls the application layer method `book(CreateBookingCommand command)` with the `CreateBookingCommand`
 4. The `BookingService` then performs a data check, creates the domain objects and calls the `BookingRepository` with the `createBooking(Booking booking)` to persist the booking
 5. After the domain actions for the create booking use case have been carried out, the application layer creates a `BookingCreatedEvent` and sends it to the `EventPublisher`
-6. Every `Event` in the `EventPublisher` is sent to the `EventRestController` with the Port `8080`
+6. Every `Event` in the `EventPublisher` is sent to the `EventRestController` with the Port `8083`
  
 ### Event side sequence (booking is created)
 
 The `Event` side is used to log events. This has several advantages. First off, it can be used for eventual consistancy and to send messages between aggregates. It is also useful for logging what happened in our application. And last but not least, if we apply all events on an inital set of data on our core domain, we will end up with a valid state. So therefore, the logic in the `Event` side is not that complex:
 
-1. The `Write` side `EventPublisher` sends a HTTP POST request, containing the `BookingCreatedEvent` to the `EventRestController` with the Port `8080`
+1. The `Write` side `EventPublisher` sends a HTTP POST request, containing the `BookingCreatedEvent` to the `EventRestController` with the Port `8083`
 2. The `EventRestController` calls the `EventRepository` method `process(Event event)` 
 3. The `EventRepository` adds the `BookingCreatedEvent` to a list of `Event`s and informs the subscribers of the `BookingCreatedEvent` about the changes by sending a HTTP POST request, containing the `BookingCreatedEvent` to the `ReadRestController` with the Port `8082`
 
@@ -133,6 +133,6 @@ The `Read` sides job is to structure data in a way that can easily be queried to
 
 ### Starting our project
 
-To start the project, make sure to start all 3 `Main` classes (`WriteSide`, `EventSide` and `ReadSide`) in the `Lab1Template/src/main/java/at/fhv/lab1reference/` folder. You can see and use all the REST interfaces in the Swagger-UI `http://localhost:808x/swagger-ui/index.html`. 
+To start the project, make sure to start all 3 `Main` classes (`WriteSide`, `EventSide` and `ReadSide`) in the `Lab1Template/src/main/java/at/fhv/lab1reference/` folder. You can see and use all the REST interfaces in the Swagger-UI `http://localhost:808x/swagger-ui/index.html`.
 
 - - - -
