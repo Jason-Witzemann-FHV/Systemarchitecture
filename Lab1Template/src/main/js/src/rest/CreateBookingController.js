@@ -1,5 +1,6 @@
 import { get } from 'svelte/store';
 import { arrival, departure, socialSecurityNumber, chosenRooms} from '../storage/CreateBookingStorage.js';
+import { Snackbar } from 'svelma'
 
 export function createBooking() {
 
@@ -14,7 +15,20 @@ export function createBooking() {
         + `arrivalDateString=${dateArrival}&`
         + `departureDateString=${dateDeparture}`
 
-    console.log(req)
     fetch(req, {method: "POST"})
-
+        .then(response => response.text())
+        .then(text => {
+            if(text === "true") {
+                Snackbar.create({
+                    message: "Buchung erfolgreich registriert!", 
+                    type: "is-success",
+               })
+            } else {
+                Snackbar.create({
+                    message: "Ungültige Buchungsdaten!", 
+                    type: "is-danger",
+                })
+            }
+        })
 }
+

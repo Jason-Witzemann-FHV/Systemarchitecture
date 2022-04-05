@@ -4,13 +4,13 @@
 	import { getBookedStays } from '../rest/GetBookingsController.js'
     import { cancelBooking } from '../rest/CancelBookingRestcontroller.js'
 	import { fly } from 'svelte/transition';
+	import { Field, Input, Button, Tag } from 'svelma'
 
 	$: buttonStatus = ($departure >= $arrival) ? "is-primary" : "disabled";
 
     function resetFoundRooms() {
 		$bookings = [];
 	}
-
 	
     function prepareCancelBooking(bookingId) {
         $bookings = [...$bookings.filter(b => b.bookingId !== bookingId)]
@@ -26,22 +26,19 @@
 </p>
 <div class="columns">
 	<div class="column is-5">
-		<label class="label" for="get-bookings-from">Von</label>
-		<div class="control">
-			<input class="input" type="date" id="get-bookings-from" bind:value={$arrival} />
-		</div>
+		<Field label="Von">
+            <Input type="date" bind:value={$arrival} />
+        </Field>
 	</div>
 	<div class="column is-5">
-		<label class="label" for="get-bookings-to">Bis</label>
-		<div class="control">
-			<input class="input" type="date" id="get-bookings-to" bind:value={$departure}/>
-		</div>
+		<Field label="Bis">
+            <Input type="date" bind:value={$departure} />
+        </Field>
 	</div>
 	<div class="column is-2">
-		<label class="label" for="get-bookings-button" hidden>&#8203</label>
-		<div class="control">
-			<button class="button {buttonStatus}" id="get-bookings-button" on:click={ getBookedStays }>Check!</button>
-		</div>
+		<Field label="&#8203">
+            <Button type="{buttonStatus}" on:click={ getBookedStays }>Check!</Button>
+        </Field>
 	</div>
 </div>
 
@@ -63,15 +60,15 @@
 						<td> {customerName} </td>
 						<td> {from} </td>
 						<td> {to} </td>
-                        <td class="has-text-centered"> <span class="tag">{rooms}</span> </td>
-                        <td> <button class="button is-danger is-light" on:click={ () => prepareCancelBooking(bookingId)}>Stornieren</button> </td>
+                        <td class="has-text-centered"> <Tag>{rooms}</Tag> </td>
+                        <td> <Button type="is-danger is-light" on:click={ () => prepareCancelBooking(bookingId)}>Stornieren</Button> </td>
 					</tr>
 				{/each}
 
 			</table>
 		</div>
 		<div class="column is-1">
-			<button class="button is-disabled has-text-centered" on:click={resetFoundRooms}>Clear</button>
+			<Button type="is-disabled has-text-centered" on:click={resetFoundRooms}>Clear</Button>
 		</div>
 	</div>
 {/if}

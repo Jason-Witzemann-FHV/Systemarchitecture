@@ -3,6 +3,7 @@
 	import { freeRooms, arrival, departure, beds } from '../storage/FreeRoomStorage.js';
 	import { findFreeRooms } from '../rest/FreeRoomsController.js'
 	import { fly } from 'svelte/transition';
+	import { Field, Input, Button, Tag } from 'svelma'
 
 	$: buttonStatus = ($departure >= $arrival) ? "is-primary" : "disabled";
 
@@ -18,35 +19,24 @@
 </p>
 <div class="columns">
 	<div class="column is-4">
-		<label class="label" for="free-rooms-from">Ankunft</label>
-		<div class="control">
-			<input class="input" type="date" id="free-rooms-from" bind:value={$arrival} />
-		</div>
+		<Field label="Ankunft">
+            <Input type="date" bind:value={$arrival} />
+        </Field>
 	</div>
 	<div class="column is-4">
-		<label class="label" for="free-rooms-to">Abreise</label>
-		<div class="control">
-			<input class="input" type="date" id="free-rooms-to" bind:value={$departure}/>
-		</div>
+		<Field label="Abreise">
+            <Input type="date" bind:value={$departure} />
+        </Field>
 	</div>
 	<div class="column is-2">
-		<label class="label" for="free-rooms-nr-of-people">Raumgröße</label>
-		<div class="control">
-			<input
-				class="input"
-				type="number"
-				id="free-rooms-nr-of-people"
-				min="1"
-				max="9"
-				bind:value={$beds}
-			/>
-		</div>
+		<Field label="Raumgröße">
+            <Input type="number" min="1" max="9" bind:value={$beds} />
+        </Field>
 	</div>
 	<div class="column is-2">
-		<label class="label" for="free-rooms-nr-of-people" hidden>&#8203</label>
-		<div class="control">
-			<button class="button {buttonStatus}" id="free-room-button" on:click={ findFreeRooms }>Check!</button>
-		</div>
+		<Field label="&#8203">
+            <Button type="{buttonStatus}" on:click={ findFreeRooms }>Check!</Button>
+        </Field>
 	</div>
 </div>
 
@@ -67,14 +57,14 @@
 						<td> {roomnumber} </td>
 						<td> {from} </td>
 						<td> {to} </td>
-						<td class="has-text-centered"> <span class="tag is-light">{amountOfPeople} {amountOfPeople == 1 ? "Bett" : "Betten" } </span> </td>
+						<td class="has-text-centered"> <Tag type="is-light">{amountOfPeople} {amountOfPeople == 1 ? "Bett" : "Betten" } </Tag> </td>
 					</tr>
 				{/each}
 
 			</table>
 		</div>
 		<div class="column is-1">
-			<button class="button is-disabled has-text-centered" on:click={resetFoundRooms}>Clear</button>
+			<Button type="is-disabled has-text-centered" on:click={resetFoundRooms}>Clear</Button>
 		</div>
 	</div>
 {/if}

@@ -40,8 +40,7 @@ public class WriteRestController {
                 departureDate
         );
 
-        bookingService.book(bookRoomsCommand);
-        return true;
+        return bookingService.book(bookRoomsCommand);
     }
 
     /**
