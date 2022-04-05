@@ -3,6 +3,8 @@ package writeside.rest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import writeside.application.BookingService;
+import writeside.application.command.BookRoomsCommand;
+import writeside.application.command.CancelRoomCommand;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -30,8 +32,15 @@ public class WriteRestController {
         LocalDate arrivalDate = LocalDate.parse(arrivalDateString, DateTimeFormatter.ISO_DATE);
         LocalDate departureDate = LocalDate.parse(departureDateString, DateTimeFormatter.ISO_DATE);
         List<String> rooms = Arrays.stream(roomsArray).collect(Collectors.toList());
-        // Todo Validation of input??
-        bookingService.book(scnr, rooms, arrivalDate, departureDate);
+
+        BookRoomsCommand bookRoomsCommand = new BookRoomsCommand(
+                scnr,
+                rooms,
+                arrivalDate,
+                departureDate
+        );
+
+        bookingService.book(bookRoomsCommand);
         return true;
     }
 
@@ -40,8 +49,8 @@ public class WriteRestController {
      */
     @PostMapping(value = "/cancelBooking")
     public boolean cancelBooking(@RequestParam String bookingIdString) {
-        UUID bookingId = UUID.fromString(bookingIdString);
-        bookingService.cancel(bookingId);
+        CancelRoomCommand cancelRoomCommand = new CancelRoomCommand(UUID.fromString(bookingIdString));
+        bookingService.cancel(cancelRoomCommand);
         return true;
     }
 
