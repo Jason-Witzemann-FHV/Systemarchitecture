@@ -11,7 +11,7 @@ import writeside.domain.repository.WriteSideEventPublisher;
 @Repository
 public class WriteSideEventPublisherImpl implements WriteSideEventPublisher {
 
-    private final WebClient localApiClient = WebClient.create("http://localhost:8080");
+    private final WebClient localApiClient = WebClient.create("http://localhost:8083");
 
     @Override
     public Boolean publishBookingCreatedEvent(BookingCreatedEvent event) {

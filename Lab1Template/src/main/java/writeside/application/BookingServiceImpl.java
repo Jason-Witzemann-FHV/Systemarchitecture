@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import writeside.application.command.BookRoomsCommand;
 import writeside.application.command.CancelRoomCommand;
 import writeside.domain.model.Booking;
+import writeside.domain.model.Customer;
 import writeside.domain.model.Room;
 import writeside.domain.repository.BookingRepository;
 import writeside.domain.repository.CustomerRepository;
@@ -39,8 +40,9 @@ public class BookingServiceImpl implements BookingService{
         Set<String> roomSet = new HashSet<>(bookRooms.getRooms());
 
         // Validate Data
+        Customer customer = null;
         try {
-            customerRepository.getCustomer(bookRooms.getSocialSecurityNumber()).orElseThrow(() -> new IllegalArgumentException("customer for id " + bookRooms.getSocialSecurityNumber() + " not found"));
+            customer = customerRepository.getCustomer(bookRooms.getSocialSecurityNumber()).orElseThrow(() -> new IllegalArgumentException("customer for id " + scnr + " not found"));
             roomSet.forEach(r -> roomRepository.getRoom(r).orElseThrow(() -> new IllegalArgumentException("room with nr " + r + " not found")));
             if (!bookRooms.getDepartureDate().isAfter(bookRooms.getArrivalDate())) throw new IllegalArgumentException("Arrival and Departure date not valid");
         } catch (IllegalArgumentException e) {
@@ -64,7 +66,7 @@ public class BookingServiceImpl implements BookingService{
                 booking.getArrivalDate(),
                 booking.getDepartureDate(),
                 booking.getRooms(),
-                booking.getCustomer()
+                customer.getName()
         );
         writeSideEventPublisher.publishBookingCreatedEvent(event);
 

@@ -1,9 +1,7 @@
 package writeside.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import writeside.application.BookingService;
 import writeside.application.command.BookRoomsCommand;
 import writeside.application.command.CancelRoomCommand;
@@ -16,6 +14,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:8080"}, methods = {RequestMethod.POST})
 public class WriteRestController {
 
     // http://localhost:8081/swagger-ui/index.html
