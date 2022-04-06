@@ -1,5 +1,6 @@
 <script>
 
+	import 'bulma/css/bulma.css'
 	import FreeRooms from './components/FreeRooms.svelte'
 	import CreateBooking from './components/CreateBooking.svelte'
 	import GetBookings from './components/GetBookings.svelte'
