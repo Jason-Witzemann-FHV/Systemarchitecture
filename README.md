@@ -133,6 +133,6 @@ The `Read` sides job is to structure data in a way that can easily be queried to
 
 ### Starting our project
 
-To start the project, make sure to start all 3 `Main` classes (`WriteSide`, `EventSide` and `ReadSide`) in the `Lab1Template/src/main/java/at/fhv/lab1reference/` folder. You can see and use all the REST interfaces in the Swagger-UI `http://localhost:808x/swagger-ui/index.html`.
+To start the project, make sure to start all 3 `Main` classes (`WriteSide`, `EventSide` and `ReadSide`) in the `Lab1Template/src/main/java/at/fhv/lab1reference/` folder. You can see and use all the REST interfaces in the Swagger-UI `http://localhost:808x/swagger-ui/index.html` or if you have Node.js installed, you can go into the `Lab1Template/src/main/js` folder and type `npm run dev` (after using `npm install` once) to start a SPA on `http://localhost:8080` that can be accessed via your browser. 
 
 - - - -
