@@ -4,16 +4,6 @@ package at.fhv.sysarch.lab2.homeautomation.outside;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
 
-/**
- * This class shows ONE way to switch behaviors in object-oriented style. Another approach is the use of static
- * methods for each behavior.
- *
- * The switching of behaviors is not strictly necessary for this example, but is rather used for demonstration
- * purpose only.
- *
- * For an example with functional-style please refer to: {@link https://doc.akka.io/docs/akka/current/typed/style-guide.html#functional-versus-object-oriented-style}
- *
- */
 import java.time.Duration;
 
 public class WeatherEnvironment extends AbstractBehavior<WeatherEnvironment.WeatherEnvironmentCommand> {
