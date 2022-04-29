@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'at.fhv.lab2'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.typesafe.akka:akka-actor-typed_2.13:2.6.10'
+    implementation 'com.typesafe.akka:akka-actor-testkit-typed_2.13:2.6.10'
+    implementation 'ch.qos.logback:logback-classic:1.2.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+application {
+    mainClass = 'at.fhv.sysarch.lab2.HomeAutomationSystem'
+}
+
+run {
+    standardInput = System.in
+}
+
+test {
+    useJUnitPlatform()
+}
