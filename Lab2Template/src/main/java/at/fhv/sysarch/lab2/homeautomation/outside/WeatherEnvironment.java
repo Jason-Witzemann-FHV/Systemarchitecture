@@ -29,6 +29,7 @@ public class WeatherEnvironment extends AbstractBehavior<WeatherEnvironment.Weat
         return Behaviors.setup(context -> Behaviors.withTimers(timers -> new WeatherEnvironment(context, timers)));
     }
 
+    private Weather currentWeather;
 
     // -- actor
     public WeatherEnvironment(ActorContext<WeatherEnvironmentCommand> context, TimerScheduler<WeatherEnvironmentCommand> scheduler) {
@@ -46,7 +47,8 @@ public class WeatherEnvironment extends AbstractBehavior<WeatherEnvironment.Weat
     }
 
     private Behavior<WeatherEnvironmentCommand> doWeatherChange(WeatherUpdate weatherUpdate) {
-        getContext().getLog().info("[ENVIRONMENT] Weather set to " + Weather.random());
+        currentWeather = Weather.random();
+        getContext().getLog().info("[ENVIRONMENT] Weather set to " + currentWeather);
         return Behaviors.same();
     }
 
