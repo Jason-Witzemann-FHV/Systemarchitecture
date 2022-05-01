@@ -1,7 +1,7 @@
 # Systemarchitecture
 This repository is a collection of different Systemarchitectures lectured at the FHV in summer semester 2022. It consists of:
 * Lab Exercise **[Command Query Responsibility Segregation](#CQRS) + [Event Sourcing](#ES) for a [Hotel Management Software](#Lab1)**
-* Lab Exercise **Actors for an automated home**
+* Lab Exercise **[Actors](#Actor) for an [automated home](#Lab2)**
 * Lab Exercise **Pipes & Filters Utah Teapot**
 * Lab Exercise Game **2D Pool with Java Physics Engine and JavaFX** (Maybe a game engine too)
 
@@ -90,7 +90,7 @@ To start off, we start with an independent side. This could be anything but the 
 
 > Class model of our core domain
 
-After implementing the `Write` side, we recommend to implement the `Read` side. This makes you think about the Structure of the data that you want to offer to your end user. Therefore, we design our Repository to fit the customer needs. The idea is, that we have as little joins as possible. Ideally, we structure our data in the way we would structure our DTOs to send to the customer. So if we want to give the available rooms in a time span, we would create a `FreeRoom` DTO and safe them in a list to easily iterate over it, instead of doing complex queries to find free rooms.
+After implementing the `Write` side, we recommend implementing the `Read` side. This makes you think about the Structure of the data that you want to offer to your end user. Therefore, we design our Repository to fit the customer needs. The idea is, that we have as little joins as possible. Ideally, we structure our data in the way we would structure our DTOs to send to the customer. So if we want to give the available rooms in a time span, we would create a `FreeRoom` DTO and safe them in a list to easily iterate over it, instead of doing complex queries to find free rooms.
 
 <img src="https://user-images.githubusercontent.com/86053522/161347051-dc1e81fe-be67-423e-835a-2e9fa9e2af55.png" width="600" height="400" />
 
@@ -134,5 +134,30 @@ The `Read` sides job is to structure data in a way that can easily be queried to
 ### Starting our project
 
 To start the project, make sure to start all 3 `Main` classes (`WriteSide`, `EventSide` and `ReadSide`) in the `Lab1Template/src/main/java/at/fhv/lab1reference/` folder. You can see and use all the REST interfaces in the Swagger-UI `http://localhost:808x/swagger-ui/index.html` or if you have Node.js installed, you can go into the `Lab1Template/src/main/js` folder and type `npm run dev` (after using `npm install` once) to start a SPA on `http://localhost:8080` that can be accessed via your browser. 
+
+<a name="Actor"/>
+
+
+<a name="Lab2" />
+
+## Automated home 
+### Structure and messages
+
+To start off, we create a model on how we want to divide our actors (select guardians, sub-actors...) and how they interact with each other. We divided our actors into "devices", that act inside the house and "environment" that acts in itself outside the house. We also decided to do a separate hierarchy for the fridge as well. 
+This is our hierarchy model with all the actors and there potential attributes:
+
+
+
+We also modeled the messages between the actors, and the corresponding interaction patterns. Here are a few examples: (A full file of all the messages can be found in the folder `Lab2Template/Actors_in_smart_home.drawio` and opened online via Draw.io)
+
+
+
+### Where to start
+
+We advise starting with actors that are not dependent on other actors. This can be the environmental actors (weather and temperature) or the fridge, which in itself is a closed place with own actors. We decided to start off with the environmental actors, so that each of us can implement an environmental actor and the opposite sensor. This helped in understanding the working of the akka framework and actors in general. After the initial actors, you can continue with actors that depend on your current implementation and make them communicate with each other.
+
+Vanilla Java is not made for an actor model. This model origins from the functional programming paradigm, therefore the Java implementation of actors might seem very overloaded. Anyway, to implement an actor in Java (with the akka framework) we can follow these steps:
+
+1. Start off with ...
 
 - - - -
