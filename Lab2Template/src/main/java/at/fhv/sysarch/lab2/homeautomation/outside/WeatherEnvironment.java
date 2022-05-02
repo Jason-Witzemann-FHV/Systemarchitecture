@@ -3,6 +3,7 @@ package at.fhv.sysarch.lab2.homeautomation.outside;
 
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
+import at.fhv.sysarch.lab2.homeautomation.shared.Weather;
 
 import java.time.Duration;
 
