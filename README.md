@@ -137,6 +137,10 @@ To start the project, make sure to start all 3 `Main` classes (`WriteSide`, `Eve
 
 <a name="Actor"/>
 
+## Actor model
+
+- - - -
+
 
 <a name="Lab2" />
 
