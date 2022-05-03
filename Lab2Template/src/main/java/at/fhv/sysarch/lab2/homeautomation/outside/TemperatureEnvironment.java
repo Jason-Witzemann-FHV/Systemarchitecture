@@ -57,15 +57,12 @@ public class TemperatureEnvironment extends AbstractBehavior<TemperatureEnvironm
     private Behavior<TemperatureEnvironmentCommand> onTemperatureUpdate(TemperatureUpdate t) {
 
         //calculate temperature difference
+        //temperature pending -3/+3 of init state
         double temperatureChange = (random.nextInt(62) - 31) / (double) 10;
 
-        if (t.currentTemp.value() + temperatureChange > 25 || t.currentTemp.value() + temperatureChange < 15) {
-            currentTemperature = new Temperature(t.currentTemp.unit(), t.currentTemp.value() + temperatureChange);
-        } else {
-            currentTemperature = new Temperature(t.currentTemp.unit(), t.currentTemp.value() - temperatureChange);
-        }
-
         //set new Temperature
+        currentTemperature = new Temperature(t.currentTemp.unit(), t.currentTemp.value() - temperatureChange);
+
         getContext().getLog().info("[ENVIRONMENT] New temperature is: " + currentTemperature + " (changed by " +  temperatureChange + " " + t.currentTemp.unit() + ")");
         return this;
     }

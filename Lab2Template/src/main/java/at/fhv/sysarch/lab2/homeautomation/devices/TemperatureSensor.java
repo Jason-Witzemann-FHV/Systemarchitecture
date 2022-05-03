@@ -24,18 +24,23 @@ public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.Temper
     public static final class DoCreateTemperatureRequest implements TemperatureSensorCommand { }
 
     // -- behavior factory --
-    public static Behavior<TemperatureSensorCommand> create(ActorRef<TemperatureEnvironment.TemperatureEnvironmentCommand> environment) {
-        return Behaviors.setup(context -> Behaviors.withTimers(timer -> new TemperatureSensor(context, environment, timer)));
+    public static Behavior<TemperatureSensorCommand> create(ActorRef<TemperatureEnvironment.TemperatureEnvironmentCommand> environment, ActorRef<AirCondition.AirConditionCommand> airCondition) {
+        return Behaviors.setup(context -> Behaviors.withTimers(timer -> new TemperatureSensor(context, environment, airCondition, timer)));
     }
 
     private ActorRef<TemperatureEnvironment.TemperatureEnvironmentCommand> environment;
-    public TemperatureSensor(ActorContext<TemperatureSensorCommand> context, ActorRef<TemperatureEnvironment.TemperatureEnvironmentCommand> environment, TimerScheduler<TemperatureSensorCommand> timer) {
+    private ActorRef<AirCondition.AirConditionCommand> airCondition;
+
+    public TemperatureSensor(
+            ActorContext<TemperatureSensorCommand> context,
+            ActorRef<TemperatureEnvironment.TemperatureEnvironmentCommand> environment,
+            ActorRef<AirCondition.AirConditionCommand> airCondition,
+            TimerScheduler<TemperatureSensorCommand> timer) {
         super(context);
         this.environment = environment;
-
+        this.airCondition = airCondition;
 
         timer.startTimerAtFixedRate(new DoCreateTemperatureRequest(), Duration.ofSeconds(5));
-
     }
 
     @Override
@@ -53,9 +58,7 @@ public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.Temper
 
     private Behavior<TemperatureSensorCommand> onReceiveTemperature(ReceiveTemperatureResponse readTemperature) {
         getContext().getLog().info("[SENSOR] measured " + readTemperature.currentTemp);
-        // todo: distribute info
+        airCondition.tell(new AirCondition.ReceiveTemperature(new Temperature(readTemperature.currentTemp.unit(), readTemperature.currentTemp.value())));
         return this;
     }
-
-
 }
