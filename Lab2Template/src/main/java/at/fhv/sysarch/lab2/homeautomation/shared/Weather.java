@@ -1,4 +1,4 @@
-package at.fhv.sysarch.lab2.homeautomation.outside;
+package at.fhv.sysarch.lab2.homeautomation.shared;
 
 import java.util.Random;
 
