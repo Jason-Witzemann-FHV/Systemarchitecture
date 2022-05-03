@@ -158,8 +158,14 @@ We advise starting with actors that are not dependent on other actors. This can 
 
 Vanilla Java is not made for an actor model. This model origins from the functional programming paradigm, therefore the Java implementation of actors might seem very overloaded. Anyway, to implement an actor in Java (with the akka framework) we can follow these steps:
 
-(example of Temperature Environment)
-1. Create the temperature environment actor which extends the `AbstractBehavior<>`
-2. Define the messages that your class will receive 
+(example of Temperature Sensor `Lab2Template/src/main/java/at/fhv/sysarch/lab2/homeautomation/devices/TemperatureSensor.java`)
+1. Create your class / actor `TemperatureSensor`, and an interface (`TemperatureSensorCommand`) inside your class. This interface is used for every `Message`, `Behavior` and `ActorRef` regarding your class.
+2. Make the `TemperatureSensor` extend the `AbstractBehavior` with your interface (`AbstractBehavior<TemperatureSensor.TemperatureSensorCommand>`) 
+3. Define the messages that your class will *receive*. Make it implement the interface of `step 1` and think about the data you need in the message. Remember, that messages should be immutable! We need a self-scheduled message, that triggers a polling-request to the `TemperatureEnvironment` and a  response message. Implement the self-scheduling and response message in this class!
+4. Think about the attributes of your actor and create a constructor for it. Your constructor needs the actors attributes, a context and maybe other data like scheduled timers.
+5. With the actor model, we work with `Behaviors`, therefore we can't just have a constructor. We also need a behavior factory (`create` method), that creates the behavior. This will later be used to `spawn` our actors, giving it the `context` in which it will be used.
+6. We now need to implement the `createReceive` method. This method is inherited by the `AbstractBehavior` and is used to call the correct method, that should be invoked on a specified, incoming message. We add an `onMessage(DoCreateTemperatureRequest)` for the self-scheduled message and an `onMessage(ReceiveTemperatureResponse)` for the response.
+7. Lastly, we implement the methods that will be called on a message receive. The method, that gets called by the self-scheduled message, will call the Actor of our `TemperatureEnvironment` by `tell`ing them a `Request` message. The other method will receive the current Temperature of our `TemperatureEnvironment` and send it to the `AirCondition` actor.
+8. After implementing the actor, we need to spawn it in the correct context via the `HomeAutomationController`. 
 
 - - - -
