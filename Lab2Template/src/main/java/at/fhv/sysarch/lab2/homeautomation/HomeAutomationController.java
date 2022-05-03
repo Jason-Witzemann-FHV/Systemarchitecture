@@ -8,10 +8,12 @@ import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
+import at.fhv.sysarch.lab2.homeautomation.devices.MediaStation;
 import at.fhv.sysarch.lab2.homeautomation.devices.TemperatureSensor;
 import at.fhv.sysarch.lab2.homeautomation.outside.TemperatureEnvironment;
 import at.fhv.sysarch.lab2.homeautomation.outside.WeatherEnvironment;
 import at.fhv.sysarch.lab2.homeautomation.shared.Temperature;
+import at.fhv.sysarch.lab2.homeautomation.ui.UI;
 
 public class HomeAutomationController extends AbstractBehavior<Void>{
 
@@ -30,6 +32,10 @@ public class HomeAutomationController extends AbstractBehavior<Void>{
         ActorSystem<TemperatureSensor.TemperatureSensorCommand> temperatureSensor = ActorSystem.create(TemperatureSensor.create(temperatureEnvironment), "TemperatureSensor");
 
         // devices
+        ActorRef<MediaStation.MediaStationCommand> mediaStation = getContext().spawn(MediaStation.create(), "MediaStation");
+
+        // UI
+        ActorRef<Void> ui = getContext().spawn(UI.create(mediaStation), "UI");
 
         getContext().getLog().info("HomeAutomation Application started");
     }
