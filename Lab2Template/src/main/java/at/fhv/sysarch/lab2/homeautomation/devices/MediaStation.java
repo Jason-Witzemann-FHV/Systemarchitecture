@@ -1,5 +1,6 @@
 package at.fhv.sysarch.lab2.homeautomation.devices;
 
+import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
@@ -24,14 +25,16 @@ public class MediaStation extends AbstractBehavior<MediaStation.MediaStationComm
 
     }
 
-    public static Behavior<MediaStationCommand> create() {
-        return Behaviors.setup(MediaStation::new);
+    public static Behavior<MediaStationCommand> create(ActorRef<Blinds.BlindsCommand> blinds) {
+        return Behaviors.setup(context -> new MediaStation(context, blinds));
     }
 
+    private ActorRef<Blinds.BlindsCommand> blinds;
     private Movie currentMovie;
 
-    public MediaStation(ActorContext<MediaStationCommand> context) {
+    public MediaStation(ActorContext<MediaStationCommand> context, ActorRef<Blinds.BlindsCommand> blinds) {
         super(context);
+        this.blinds = blinds;
     }
 
 
@@ -50,7 +53,7 @@ public class MediaStation extends AbstractBehavior<MediaStation.MediaStationComm
             currentMovie = command.movie;
             getContext().getLog().info("[DEVICE] MediaStation is now playing " + currentMovie.title());
 
-            // todo inform blinds
+            blinds.tell(new Blinds.MediaStationStatusChangedCommand(true));
         } else {
             getContext().getLog().info("[DEVICE] MediaStation is currently playing " + currentMovie.title() + " therefore requested movie " + command.movie.title() + "cannot be played");
         }
@@ -62,7 +65,7 @@ public class MediaStation extends AbstractBehavior<MediaStation.MediaStationComm
 
         currentMovie = null;
         getContext().getLog().info("[DEVICE] Media Station now turned off");
-        // todo inform blinds
+        blinds.tell(new Blinds.MediaStationStatusChangedCommand(false));
 
         return this;
     }

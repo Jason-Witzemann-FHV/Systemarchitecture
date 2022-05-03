@@ -1,12 +1,13 @@
 package at.fhv.sysarch.lab2.homeautomation;
 
-import akka.actor.typed.ActorSystem;
+import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.PostStop;
 import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
+import at.fhv.sysarch.lab2.homeautomation.devices.Blinds;
 import at.fhv.sysarch.lab2.homeautomation.devices.MediaStation;
 import at.fhv.sysarch.lab2.homeautomation.devices.TemperatureSensor;
 import at.fhv.sysarch.lab2.homeautomation.devices.WeatherSensor;
@@ -26,16 +27,20 @@ public class HomeAutomationController extends AbstractBehavior<Void>{
     private  HomeAutomationController(ActorContext<Void> context) {
         super(context);
 
-        // environment
-        ActorSystem<WeatherEnvironment.WeatherEnvironmentCommand> weatherEnvironment = ActorSystem.create(WeatherEnvironment.create(Weather.SUNNY), "WetterGott");
-        ActorSystem<TemperatureEnvironment.TemperatureEnvironmentCommand> temperatureEnvironment = ActorSystem.create(TemperatureEnvironment.create(new Temperature("Celcius", 22)), "TemperatureEnvironment");
 
-        // sensors
-        ActorSystem<TemperatureSensor.TemperatureSensorCommand> temperatureSensor = ActorSystem.create(TemperatureSensor.create(temperatureEnvironment), "TemperatureSensor");
-        ActorSystem<WeatherSensor.WeatherSensorCommand> weatherSensor = ActorSystem.create(WeatherSensor.create(weatherEnvironment), "WeatherSensor");
+
+        // environment
+        ActorRef<WeatherEnvironment.WeatherEnvironmentCommand> weatherEnvironment = getContext().spawn(WeatherEnvironment.create(Weather.SUNNY), "WetterGott");
+        ActorRef<TemperatureEnvironment.TemperatureEnvironmentCommand> temperatureEnvironment = getContext().spawn(TemperatureEnvironment.create(new Temperature("Celcius", 22)), "TemperatureEnvironment");
+
+
+
 
         // devices
-        ActorRef<MediaStation.MediaStationCommand> mediaStation = getContext().spawn(MediaStation.create(), "MediaStation");
+        ActorRef<Blinds.BlindsCommand> blinds = getContext().spawn(Blinds.create(), "Blinds");
+        ActorRef<MediaStation.MediaStationCommand> mediaStation = getContext().spawn(MediaStation.create(blinds), "MediaStation");
+        ActorRef<TemperatureSensor.TemperatureSensorCommand> temperatureSensor = getContext().spawn(TemperatureSensor.create(temperatureEnvironment), "TemperatureSensor");
+        ActorRef<WeatherSensor.WeatherSensorCommand> weatherSensor = getContext().spawn(WeatherSensor.create(weatherEnvironment, blinds), "WeatherSensor");
 
         // UI
         ActorRef<Void> ui = getContext().spawn(UI.create(mediaStation), "UI");

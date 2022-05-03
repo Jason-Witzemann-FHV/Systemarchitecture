@@ -25,18 +25,26 @@ public class WeatherSensor extends AbstractBehavior<WeatherSensor.WeatherSensorC
     public static final class ScheduleWeatherRequest implements WeatherSensorCommand { }
 
     // factory
-    public static Behavior<WeatherSensorCommand> create(ActorRef<WeatherEnvironment.WeatherEnvironmentCommand> environment) {
-        return Behaviors.setup(context -> Behaviors.withTimers(timer -> new WeatherSensor(context, environment, timer)));
+    public static Behavior<WeatherSensorCommand> create(ActorRef<WeatherEnvironment.WeatherEnvironmentCommand> environment, ActorRef<Blinds.BlindsCommand> blinds) {
+        return Behaviors.setup(context -> Behaviors.withTimers(timer -> new WeatherSensor(context, environment, blinds, timer)));
     }
 
     // attributes of class
     private ActorRef<WeatherEnvironment.WeatherEnvironmentCommand> environment;
+    private ActorRef<Blinds.BlindsCommand> blinds;
+
+    private Weather previousWeather = Weather.RAINY;
 
     // constructor
-    public WeatherSensor(ActorContext<WeatherSensorCommand> context, ActorRef<WeatherEnvironment.WeatherEnvironmentCommand> environment, TimerScheduler<WeatherSensorCommand> timer) {
+    public WeatherSensor(
+            ActorContext<WeatherSensorCommand> context,
+            ActorRef<WeatherEnvironment.WeatherEnvironmentCommand> environment,
+            ActorRef<Blinds.BlindsCommand> blinds,
+            TimerScheduler<WeatherSensorCommand> timer
+    ) {
         super(context);
         this.environment = environment;
-
+        this.blinds = blinds;
         timer.startTimerAtFixedRate(new ScheduleWeatherRequest(), Duration.ofSeconds(15));
     }
 
@@ -54,7 +62,12 @@ public class WeatherSensor extends AbstractBehavior<WeatherSensor.WeatherSensorC
     }
 
     private Behavior<WeatherSensorCommand> receiveWeather(ReceiveWeatherResponse response) {
-        //TODO: implement what happens on message Receive
+        var newWeather = response.currentWeather;
+        if (newWeather != previousWeather)  {
+            previousWeather = newWeather;
+            blinds.tell(new Blinds.WeatherChangedCommand(newWeather == Weather.RAINY));
+        }
+
         getContext().getLog().info("[SENSOR] measured Weather: " + response.currentWeather);
         return this;
     }
