@@ -52,7 +52,7 @@ public class TemperatureSensor extends AbstractBehavior<TemperatureSensor.Temper
     }
 
     private Behavior<TemperatureSensorCommand> onReceiveTemperature(ReceiveTemperatureResponse readTemperature) {
-        getContext().getLog().info("[SENSOR] measured Temperature: " + readTemperature.currentTemp.value() + " " + readTemperature.currentTemp.unit());
+        getContext().getLog().info("[SENSOR] measured " + readTemperature.currentTemp);
         // todo: distribute info
         return this;
     }
