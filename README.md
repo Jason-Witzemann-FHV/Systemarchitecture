@@ -1,7 +1,7 @@
 # Systemarchitecture
 This repository is a collection of different Systemarchitectures lectured at the FHV in summer semester 2022. It consists of:
 * Lab Exercise **[Command Query Responsibility Segregation](#CQRS) + [Event Sourcing](#ES) for a [Hotel Management Software](#Lab1)**
-* Lab Exercise **Actors for an automated home**
+* Lab Exercise **[Actors](#Actor) for an [automated home](#Lab2)**
 * Lab Exercise **Pipes & Filters Utah Teapot**
 * Lab Exercise Game **2D Pool with Java Physics Engine and JavaFX** (Maybe a game engine too)
 
@@ -90,7 +90,7 @@ To start off, we start with an independent side. This could be anything but the 
 
 > Class model of our core domain
 
-After implementing the `Write` side, we recommend to implement the `Read` side. This makes you think about the Structure of the data that you want to offer to your end user. Therefore, we design our Repository to fit the customer needs. The idea is, that we have as little joins as possible. Ideally, we structure our data in the way we would structure our DTOs to send to the customer. So if we want to give the available rooms in a time span, we would create a `FreeRoom` DTO and safe them in a list to easily iterate over it, instead of doing complex queries to find free rooms.
+After implementing the `Write` side, we recommend implementing the `Read` side. This makes you think about the Structure of the data that you want to offer to your end user. Therefore, we design our Repository to fit the customer needs. The idea is, that we have as little joins as possible. Ideally, we structure our data in the way we would structure our DTOs to send to the customer. So if we want to give the available rooms in a time span, we would create a `FreeRoom` DTO and safe them in a list to easily iterate over it, instead of doing complex queries to find free rooms.
 
 <img src="https://user-images.githubusercontent.com/86053522/161347051-dc1e81fe-be67-423e-835a-2e9fa9e2af55.png" width="600" height="400" />
 
@@ -134,5 +134,38 @@ The `Read` sides job is to structure data in a way that can easily be queried to
 ### Starting our project
 
 To start the project, make sure to start all 3 `Main` classes (`WriteSide`, `EventSide` and `ReadSide`) in the `Lab1Template/src/main/java/at/fhv/lab1reference/` folder. You can see and use all the REST interfaces in the Swagger-UI `http://localhost:808x/swagger-ui/index.html` or if you have Node.js installed, you can go into the `Lab1Template/src/main/js` folder and type `npm run dev` (after using `npm install` once) to start a SPA on `http://localhost:8080` that can be accessed via your browser. 
+
+<a name="Actor"/>
+
+
+<a name="Lab2" />
+
+## Automated home 
+### Structure and messages
+
+To start off, we create a model on how we want to divide our actors (select guardians, sub-actors...) and how they interact with each other. We divided our actors into "devices", that act inside the house and "environment" that acts in itself outside the house. We also decided to do a separate hierarchy for the fridge as well. 
+This is our hierarchy model with all the actors and there potential attributes:
+
+
+
+We also modeled the messages between the actors, and the corresponding interaction patterns. Here are a few examples: (A full file of all the messages can be found in the folder `Lab2Template/Actors_in_smart_home.drawio` and opened online via Draw.io)
+
+
+
+### Where to start
+
+We advise starting with actors that are not dependent on other actors. This can be the environmental actors (weather and temperature) or the fridge, which in itself is a closed place with own actors. We decided to start off with the environmental actors, so that each of us can implement an environmental actor and the opposite sensor. This helped in understanding the working of the akka framework and actors in general. After the initial actors, you can continue with actors that depend on your current implementation and make them communicate with each other.
+
+Vanilla Java is not made for an actor model. This model origins from the functional programming paradigm, therefore the Java implementation of actors might seem very overloaded. Anyway, to implement an actor in Java (with the akka framework) we can follow these steps:
+
+(example of Temperature Sensor `Lab2Template/src/main/java/at/fhv/sysarch/lab2/homeautomation/devices/TemperatureSensor.java`)
+1. Create your class / actor `TemperatureSensor`, and an interface (`TemperatureSensorCommand`) inside your class. This interface is used for every `Message`, `Behavior` and `ActorRef` regarding your class.
+2. Make the `TemperatureSensor` extend the `AbstractBehavior` with your interface (`AbstractBehavior<TemperatureSensor.TemperatureSensorCommand>`) 
+3. Define the messages that your class will *receive*. Make it implement the interface of `step 1` and think about the data you need in the message. Remember, that messages should be immutable! We need a self-scheduled message, that triggers a polling-request to the `TemperatureEnvironment` and a  response message. Implement the self-scheduling and response message in this class!
+4. Think about the attributes of your actor and create a constructor for it. Your constructor needs the actors attributes, a context and maybe other data like scheduled timers.
+5. With the actor model, we work with `Behaviors`, therefore we can't just have a constructor. We also need a behavior factory (`create` method), that creates the behavior. This will later be used to `spawn` our actors, giving it the `context` in which it will be used.
+6. We now need to implement the `createReceive` method. This method is inherited by the `AbstractBehavior` and is used to call the correct method, that should be invoked on a specified, incoming message. We add an `onMessage(DoCreateTemperatureRequest)` for the self-scheduled message and an `onMessage(ReceiveTemperatureResponse)` for the response.
+7. Lastly, we implement the methods that will be called on a message receive. The method, that gets called by the self-scheduled message, will call the Actor of our `TemperatureEnvironment` by `tell`ing them a `Request` message. The other method will receive the current Temperature of our `TemperatureEnvironment` and send it to the `AirCondition` actor.
+8. After implementing the actor, we need to spawn it in the correct context via the `HomeAutomationController`. 
 
 - - - -
