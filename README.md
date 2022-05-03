@@ -139,6 +139,8 @@ To start the project, make sure to start all 3 `Main` classes (`WriteSide`, `Eve
 
 ## Actor model
 
+*Theory to be added...* 
+
 - - - -
 
 
@@ -176,5 +178,25 @@ Vanilla Java is not made for an actor model. This model origins from the functio
 6. We now need to implement the `createReceive` method. This method is inherited by the `AbstractBehavior` and is used to call the correct method, that should be invoked on a specified, incoming message. We add an `onMessage(DoCreateTemperatureRequest)` for the self-scheduled message and an `onMessage(ReceiveTemperatureResponse)` for the response.
 7. Lastly, we implement the methods that will be called on a message receive. The method, that gets called by the self-scheduled message, will call the Actor of our `TemperatureEnvironment` by `tell`ing them a `Request` message. The other method will receive the current Temperature of our `TemperatureEnvironment` and send it to the `AirCondition` actor. Remember to always return a `Behavior`, so that ur actor stays alive.
 8. After implementing the actor, we need to spawn it in the correct context via the `HomeAutomationController`. 
+
+### Commands to use
+
+* Mediastation:
+    * media on [name of movie]
+    * media off
+
+* Fridge:
+    * fridge content
+    * fridge history
+    * fridge order [name_of_order]
+    * fridge consume [name_of_order]
+
+* Orders:
+    * apple
+    * cheese
+    * sausage
+    * steak
+    * carrots
+    * beer
 
 - - - -
