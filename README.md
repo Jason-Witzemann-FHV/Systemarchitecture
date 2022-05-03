@@ -146,10 +146,15 @@ To start the project, make sure to start all 3 `Main` classes (`WriteSide`, `Eve
 To start off, we create a model on how we want to divide our actors (select guardians, sub-actors...) and how they interact with each other. We divided our actors into "devices", that act inside the house and "environment" that acts in itself outside the house. We also decided to do a separate hierarchy for the fridge as well. 
 This is our hierarchy model with all the actors and there potential attributes:
 
+<img src="https://user-images.githubusercontent.com/86053522/166518398-f9be4966-67c1-42bb-9a15-2bc85a9c0d01.png" width="600" height="400" />
 
+> Guardian hierarchy of home automation 
 
 We also modeled the messages between the actors, and the corresponding interaction patterns. Here are a few examples: (A full file of all the messages can be found in the folder `Lab2Template/Actors_in_smart_home.drawio` and opened online via Draw.io)
 
+<img src="https://user-images.githubusercontent.com/86053522/166518954-6bdc303e-06cc-43de-99b6-688620e543f4.png" width="600" height="400" />
+
+> Examples of different interaction patterns
 
 
 ### Where to start
