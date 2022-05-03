@@ -158,6 +158,8 @@ We advise starting with actors that are not dependent on other actors. This can 
 
 Vanilla Java is not made for an actor model. This model origins from the functional programming paradigm, therefore the Java implementation of actors might seem very overloaded. Anyway, to implement an actor in Java (with the akka framework) we can follow these steps:
 
-1. Start off with ...
+(example of Temperature Environment)
+1. Create the temperature environment actor which extends the `AbstractBehavior<>`
+2. Define the messages that your class will receive 
 
 - - - -
