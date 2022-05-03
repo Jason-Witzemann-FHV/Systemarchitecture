@@ -181,6 +181,8 @@ Vanilla Java is not made for an actor model. This model origins from the functio
 
 ### Commands to use
 
+Start the application via the main function of the `/Lab2Template/src/main/java/at/fhv/sysarch/lab2/HomeAutomationSystem.java` class
+
 * Mediastation:
     * media on [name of movie]
     * media off
