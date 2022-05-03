@@ -8,6 +8,8 @@ import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
 import at.fhv.sysarch.lab2.homeautomation.devices.MediaStation;
+import at.fhv.sysarch.lab2.homeautomation.fridge.Fridge;
+import at.fhv.sysarch.lab2.homeautomation.fridge.Order;
 import at.fhv.sysarch.lab2.homeautomation.shared.Movie;
 
 import java.util.Arrays;
@@ -18,13 +20,16 @@ public class UI extends AbstractBehavior<Void> {
 
     private ActorRef<MediaStation.MediaStationCommand> mediaStation;
 
-    public static Behavior<Void> create(ActorRef<MediaStation.MediaStationCommand> mediaStation) {
-        return Behaviors.setup(context -> new UI(context, mediaStation));
+    private ActorRef<Fridge.FridgeCommand> fridge;
+
+    public static Behavior<Void> create(ActorRef<MediaStation.MediaStationCommand> mediaStation, ActorRef<Fridge.FridgeCommand> fridge) {
+        return Behaviors.setup(context -> new UI(context, mediaStation, fridge));
     }
 
-    private UI(ActorContext<Void> context, ActorRef<MediaStation.MediaStationCommand> mediaStation) {
+    private UI(ActorContext<Void> context, ActorRef<MediaStation.MediaStationCommand> mediaStation, ActorRef<Fridge.FridgeCommand> fridge) {
         super(context);
         this.mediaStation = mediaStation;
+        this.fridge = fridge;
         new Thread(() -> { this.runCommandLine(); }).start();
 
         getContext().getLog().info("UI started");
@@ -52,13 +57,9 @@ public class UI extends AbstractBehavior<Void> {
             String[] args = Arrays.stream(splits).toList().subList(1, splits.length).toArray(new String[splits.length - 1]);
 
             switch (command) {
-                case "media":
-                    mediaStationCommand(args);
-                    break;
-
-                default:
-                    System.out.println("unknown command");
-                    break;
+                case "media" -> mediaStationCommand(args);
+                case "fridge" -> fridgeCommand(args);
+                default -> System.out.println("unknown command");
             }
 
 
@@ -86,6 +87,46 @@ public class UI extends AbstractBehavior<Void> {
             mediaStation.tell(new MediaStation.TurnMediaStationOffCommand());
         }
 
+    }
+
+    private void fridgeCommand(String[] args) {
+
+        if (args.length == 0) {
+
+            System.out.println("[CMD] Fridge - Usage:");
+            System.out.println("[CMD] - fridge content");
+            System.out.println("[CMD] - fridge history");
+            System.out.println("[CMD] - fridge order [name_of_order]");
+            System.out.println("[CMD] - fridge consume [name_of_order]");
+
+        } else if (args[0].equalsIgnoreCase("content")) {
+
+            fridge.tell(new Fridge.FridgeListContentCommand());
+
+        } else if (args[0].equalsIgnoreCase("history")) {
+
+            fridge.tell(new Fridge.FridgeOrderHistoryCommand());
+
+        } else if (args[0].equalsIgnoreCase("consume")) {
+
+            var order = Order.withName(args[1]);
+
+            if (order.isEmpty()) {
+                System.out.println("[CMD] unknown order");
+            }
+            fridge.tell(new Fridge.FridgeConsumeCommand(order.get()));
+            System.out.println("[CMD] requested consume");
+
+        } else if (args[0].equalsIgnoreCase("order")) {
+
+            var order = Order.withName(args[1]);
+
+            if (order.isEmpty()) {
+                System.out.println("[CMD] unknown order");
+            }
+            fridge.tell(new Fridge.FridgeRequestOrderCommand(order.get()));
+            System.out.println("[CMD] requested order");
+        }
 
     }
 }
