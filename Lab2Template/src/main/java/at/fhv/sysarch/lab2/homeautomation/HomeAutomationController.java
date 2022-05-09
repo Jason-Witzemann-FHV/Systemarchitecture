@@ -40,7 +40,7 @@ public class HomeAutomationController extends AbstractBehavior<Void>{
         ActorRef<Fridge.FridgeCommand> fridge = getContext().spawn(Fridge.create(), "Fridge");
 
         // UI
-        ActorRef<Void> ui = getContext().spawn(UI.create(mediaStation, fridge), "UI");
+        ActorRef<Void> ui = getContext().spawn(UI.create(mediaStation, fridge, temperatureEnvironment), "UI");
 
         getContext().getLog().info("HomeAutomation Application started");
     }
