@@ -139,7 +139,31 @@ To start the project, make sure to start all 3 `Main` classes (`WriteSide`, `Eve
 
 ## Actor model
 
-*Theory to be added...* 
+The actor model originates from the functional programming paradigm. It is designed to fit the needs for multi-core programming. The way we used to program has come to a bottleneck in performance due to us not utilizing the multi-core CPUs. With the actor model and the *Reactive Principles*, we can make use of this technology and build more scalable applications, but also increase the complexity by a lot.
+
+The actor model is based on the *Reactive Principles*
+
+* Message Driven - the messages we send between actors are immutable. This ensures no-shared data and prevents racing conditions from happening.
+* Resilient - a actor system is very complex in the way of handling messages and their respsones. It offers a lot more room for resilient errors due to the network component that is added.
+* Elastic - actors that have nothing to do will not occupy any CPU performance. Only active actors use performance.
+* Responsive - a responsive system must respond in a fast and consistent way. Thus, because actors are originaly based off the functional programming paradigm, we can ensure the same behavior under same conditions.
+
+### What is an actor
+
+| Java Class | Actor |
+|-|-|
+| Java Classes have a constructor to create an instance of the object. | Actors get created via a Builder, which creates a **Behavior** of the desired actor |
+| Java Classes have an methods, which are called directly. | Actors also have methods, but we call them via **Messages**. We therefore create a methode (Receiver) that maps the **Message** to the corresponding method and calls it. |
+| Java Classes have an internal state (Attributes). An instance of a class will only change its attributes, when domain methods (or in the simplest way Setters) are called | An actor has internal state (Attributes). During the lifecycle of an actor, it can change its Behavior, which can lead to a change in Attributes. Attributes can also be changed via methods, like Java Classes. |
+
+### Problems of the actor model
+
+The actor model is designed to work in a concurrent, distributed environment. This also brings the typical problems of such systems with it:
+
+* How can I ensure that my message was received?
+* How can I differ between a connection loss and long computing time?
+* How much eventual consistency should I allow?
+* ...
 
 - - - -
 
@@ -178,6 +202,8 @@ Vanilla Java is not made for an actor model. This model origins from the functio
 6. We now need to implement the `createReceive` method. This method is inherited by the `AbstractBehavior` and is used to call the correct method, that should be invoked on a specified, incoming message. We add an `onMessage(DoCreateTemperatureRequest)` for the self-scheduled message and an `onMessage(ReceiveTemperatureResponse)` for the response.
 7. Lastly, we implement the methods that will be called on a message receive. The method, that gets called by the self-scheduled message, will call the Actor of our `TemperatureEnvironment` by `tell`ing them a `Request` message. The other method will receive the current Temperature of our `TemperatureEnvironment` and send it to the `AirCondition` actor. Remember to always return a `Behavior`, so that ur actor stays alive.
 8. After implementing the actor, we need to spawn it in the correct context via the `HomeAutomationController`. 
+
+A full list of the messages and actors implemented in this project can be found in the `/Lab2Template/src/main/resources/model.drawio` file.
 
 ### Commands to use
 
