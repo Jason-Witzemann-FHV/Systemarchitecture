@@ -209,6 +209,12 @@ A full list of the messages and actors implemented in this project can be found 
 
 Start the application via the main function of the `/Lab2Template/src/main/java/at/fhv/sysarch/lab2/HomeAutomationSystem.java` class
 
+To get more infos about the commands, just type `temp`, `media` or `fridge`. Here are the different commands:
+
+* Temperature:
+    * temp set [value]
+    * temp auto
+
 * Mediastation:
     * media on [name of movie]
     * media off
