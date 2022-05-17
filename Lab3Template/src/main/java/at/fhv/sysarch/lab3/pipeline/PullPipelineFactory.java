@@ -3,9 +3,11 @@ package at.fhv.sysarch.lab3.pipeline;
 import at.fhv.sysarch.lab3.animation.AnimationRenderer;
 import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.obj.Model;
+import at.fhv.sysarch.lab3.pipeline.data.Pair;
 import at.fhv.sysarch.lab3.pipeline.pull.*;
-import at.fhv.sysarch.lab3.pipeline.pull.filter.PullModelTransformation;
-import at.fhv.sysarch.lab3.pipeline.pull.filter.PullViewTransformation;
+import at.fhv.sysarch.lab3.pipeline.pull.filter.*;
+import com.hackoeur.jglm.Matrices;
+import com.hackoeur.jglm.Vec4;
 import javafx.animation.AnimationTimer;
 import javafx.scene.paint.Color;
 
@@ -14,21 +16,29 @@ public class PullPipelineFactory {
 
         // TODO: pull from the source (model)
         PullSource source = new PullSource();
-        PullPipe<Face> toModelTransformation = new PullPipe<>(source);
+        PullPipe<Face> toModelRotation = new PullPipe<>(source);
 
         // TODO 1. perform model-view transformation from model to VIEW SPACE coordinates
-        PullModelTransformation pullModelTransformation = new PullModelTransformation(toModelTransformation);
+        PullModelRotation pullModelRotationFilter = new PullModelRotation(pd, toModelRotation);
+        PullPipe<Face> toModelTransformPipe = new PullPipe<>(pullModelRotationFilter);
+
+        PullModelTransformation pullModelTransformation = new PullModelTransformation(toModelTransformPipe);
         PullPipe<Face> toViewTransformation = new PullPipe<>(pullModelTransformation);
 
         PullViewTransformation pullViewTransformation = new PullViewTransformation(toViewTransformation);
+        PullPipe<Face> afterViewTransformationPipe = new PullPipe<>(pullViewTransformation);
 
         // TODO 2. perform backface culling in VIEW SPACE
-
-
+        PullBackfaceCulling pullBackfaceCulling = new PullBackfaceCulling(afterViewTransformationPipe);
+        PullPipe<Face> toDepthSortingPipeline = new PullPipe<>(pullBackfaceCulling);
 
         // TODO 3. perform depth sorting in VIEW SPACE
+        PullDepthSorting pullDepthSorting = new PullDepthSorting(toDepthSortingPipeline);
+        PullPipe<Face> toColorPipeline = new PullPipe<>(pullDepthSorting);
 
         // TODO 4. add coloring (space unimportant)
+        PullModelColor pullModelColor = new PullModelColor(pd, toColorPipeline);
+
 
         // lighting can be switched on/off
         if (pd.isPerformLighting()) {
@@ -46,7 +56,9 @@ public class PullPipelineFactory {
         // returning an animation renderer which handles clearing of the
         // viewport and computation of the praction
         return new AnimationRenderer(pd) {
-            // TODO rotation variable goes in here
+
+            // TODO - done - rotation variable goes in here
+            float totalRotation = 0;
 
             /** This method is called for every frame from the JavaFX Animation
              * system (using an AnimationTimer, see AnimationRenderer). 
@@ -56,24 +68,45 @@ public class PullPipelineFactory {
             @Override
             protected void render(float fraction, Model model) {
 
-                source.setSourceData(model.getFaces());
-                pd.getGraphicsContext().setStroke(Color.YELLOW);
-                while(pullViewTransformation.hasNext()) {
-                    Face f = pullViewTransformation.pull();
-                    pd.getGraphicsContext().strokeLine(f.getV1().getX(), f.getV1().getY(), f.getV1().getX(), f.getV1().getY());
-                    pd.getGraphicsContext().strokeLine(f.getV2().getX(), f.getV2().getY(), f.getV2().getX(), f.getV2().getY());
-                    pd.getGraphicsContext().strokeLine(f.getV3().getX(), f.getV3().getY(), f.getV3().getX(), f.getV3().getY());
-                }
+                // TODO - done -  compute rotation in radians
+                totalRotation += fraction;
+                double rad = totalRotation % (2 * Math.PI);
 
-                // TODO compute rotation in radians
+                // TODO - done - create new model rotation matrix using pd.getModelRotAxis and Matrices.rotate
+                var rotationMatix = Matrices.rotate((float) rad, pd.getModelRotAxis());
 
-                // TODO create new model rotation matrix using pd.getModelRotAxis and Matrices.rotate
-
-                // TODO compute updated model-view tranformation
+                // TODO - done - compute updated model-view tranformation
+                pullModelRotationFilter.updateRotationMatrix(rotationMatix);
 
                 // TODO update model-view filter
+                // i guess it works not like that in our project?
 
-                // TODO trigger rendering of the pipeline
+                // TODO - done - trigger rendering of the pipeline
+                source.setSourceData(model.getFaces());
+
+                // yup that needs to be in a filter, we know
+                while(pullModelColor.hasNext()) {
+
+                    Pair<Face, Color> pair = pullModelColor.pull();
+                    Color color = pair.snd();
+                    pd.getGraphicsContext().setStroke(color);
+                    pd.getGraphicsContext().setFill(color);
+
+                    Face f = pair.fst();
+                    var cordX = new double[]{ f.getV1().getX(), f.getV2().getX(), f.getV3().getX() };
+                    var cordY = new double[]{ f.getV1().getY(), f.getV2().getY(), f.getV3().getY() };
+
+                    var ctx = pd.getGraphicsContext();
+                    switch ((pd.getRenderingMode())) {
+                        case POINT -> ctx.fillOval(cordX[0], cordY[0], 2, 2);
+                        case WIREFRAME -> ctx.strokePolygon(cordX, cordY, 3);
+                        case FILLED -> {
+                            ctx.fillPolygon(cordX, cordY, 3);
+                            ctx.strokePolygon(cordX, cordY, 3);
+                        }
+                    }
+                }
+
             }
         };
     }
