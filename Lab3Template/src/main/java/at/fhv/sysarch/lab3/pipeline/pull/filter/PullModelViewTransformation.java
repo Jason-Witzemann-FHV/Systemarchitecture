@@ -9,13 +9,13 @@ import com.hackoeur.jglm.Mat4;
 /**
  * This class applies the rotation of the model in the y axis
  */
-public class PullModelRotation<T extends Face> extends Pull<T, Face> {
+public class PullModelViewTransformation<T extends Face> extends Pull<T, Face> {
 
-    private PipelineData pd;
+    private final PipelineData pd;
     private Mat4 rotationMatrix;
 
 
-    public PullModelRotation(PipelineData pd, IPull<T> source) {
+    public PullModelViewTransformation(PipelineData pd, IPull<T> source) {
         super(source);
         this.pd = pd;
     }

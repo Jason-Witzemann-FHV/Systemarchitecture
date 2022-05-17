@@ -11,7 +11,7 @@ import java.util.*;
  */
 public class PullDepthSorting<T extends Face> extends Pull<T, Face> {
 
-    private LinkedList<Face> sortedFaces = new LinkedList<>(); // use a linkedlist instead of list for #getFirst() / #removeFirst() resulting in better performance
+    private final LinkedList<Face> sortedFaces = new LinkedList<>(); // use a linkedlist instead of list for #removeFirst() resulting in better performance
 
     public PullDepthSorting(IPull<T> source) {
         super(source);
@@ -19,9 +19,7 @@ public class PullDepthSorting<T extends Face> extends Pull<T, Face> {
 
     @Override
     public Face pull() {
-        var face = sortedFaces.getFirst();
-        sortedFaces.removeFirst();
-        return face;
+        return sortedFaces.removeFirst();
     }
 
     @Override
@@ -36,7 +34,7 @@ public class PullDepthSorting<T extends Face> extends Pull<T, Face> {
         while(source.hasNext()) {
             sortedFaces.add(source.pull());
         }
-        Collections.sort(sortedFaces, Comparator.comparing(face -> face.getV1().getZ() + face.getV2().getZ() + face.getV3().getZ()));
+        sortedFaces.sort(Comparator.comparing(face -> face.getV1().getZ() + face.getV2().getZ() + face.getV3().getZ()));
     }
 
 

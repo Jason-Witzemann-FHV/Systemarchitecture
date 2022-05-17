@@ -32,7 +32,7 @@ public class PullBackfaceCulling<T extends Face> extends Pull<T, Face> {
     private void prepareNext() {
         while(source.hasNext() && nextFace == null) {
             Face f = source.pull();
-            if (f.getV1().dot(f.getN1()) > 0) {
+            if (f.getV1().dot(f.getN1()) < 0) {
                 nextFace = f;
             }
         }

@@ -7,57 +7,58 @@ import at.fhv.sysarch.lab3.pipeline.data.Pair;
 import at.fhv.sysarch.lab3.pipeline.pull.*;
 import at.fhv.sysarch.lab3.pipeline.pull.filter.*;
 import com.hackoeur.jglm.Matrices;
-import com.hackoeur.jglm.Vec4;
 import javafx.animation.AnimationTimer;
 import javafx.scene.paint.Color;
 
 public class PullPipelineFactory {
     public static AnimationTimer createPipeline(PipelineData pd) {
 
-        // TODO: pull from the source (model)
+        // pull from the source (model)
         PullSource source = new PullSource();
-        PullPipe<Face> toModelRotation = new PullPipe<>(source);
+        PullPipe<Face> toModelTransformation = new PullPipe<>(source);
 
-        // TODO 1. perform model-view transformation from model to VIEW SPACE coordinates
-        PullModelRotation pullModelRotationFilter = new PullModelRotation(pd, toModelRotation);
-        PullPipe<Face> toModelTransformPipe = new PullPipe<>(pullModelRotationFilter);
+        // 1. perform model-view transformation from model to VIEW SPACE coordinates
+        PullModelViewTransformation<Face> pullModelViewTransformationFilter = new PullModelViewTransformation<>(pd, toModelTransformation);
+        PullPipe<Face> toModelTransformPipe = new PullPipe<>(pullModelViewTransformationFilter);
 
-        PullModelTransformation pullModelTransformation = new PullModelTransformation(toModelTransformPipe);
-        PullPipe<Face> toViewTransformation = new PullPipe<>(pullModelTransformation);
-
-        PullViewTransformation pullViewTransformation = new PullViewTransformation(toViewTransformation);
-        PullPipe<Face> afterViewTransformationPipe = new PullPipe<>(pullViewTransformation);
-
-        // TODO 2. perform backface culling in VIEW SPACE
-        PullBackfaceCulling pullBackfaceCulling = new PullBackfaceCulling(afterViewTransformationPipe);
+        // 2. perform backface culling in VIEW SPACE
+        PullBackfaceCulling<Face> pullBackfaceCulling = new PullBackfaceCulling<>(toModelTransformPipe);
         PullPipe<Face> toDepthSortingPipeline = new PullPipe<>(pullBackfaceCulling);
 
-        // TODO 3. perform depth sorting in VIEW SPACE
-        PullDepthSorting pullDepthSorting = new PullDepthSorting(toDepthSortingPipeline);
+        // 3. perform depth sorting in VIEW SPACE
+        PullDepthSorting<Face> pullDepthSorting = new PullDepthSorting<>(toDepthSortingPipeline);
         PullPipe<Face> toColorPipeline = new PullPipe<>(pullDepthSorting);
 
-        // TODO 4. add coloring (space unimportant)
-        PullModelColor pullModelColor = new PullModelColor(pd, toColorPipeline);
-
+        // 4. add coloring (space unimportant)
+        PullModelColor<Face> pullModelColor = new PullModelColor<>(pd, toColorPipeline);
 
         // lighting can be switched on/off
+        PullPipe<Pair<Face, Color>> afterLightingOrColoring;
         if (pd.isPerformLighting()) {
-            // 4a. TODO perform lighting in VIEW SPACE
-            
-            // 5. TODO perform projection transformation on VIEW SPACE coordinates
+            // 4a. perform lighting in VIEW SPACE
+            PullPipe<Pair<Face, Color>> toLighting = new PullPipe<>(pullModelColor);
+            PullLighting<Pair<Face, Color>> pullLighting = new PullLighting<>(pd, toLighting);
+            afterLightingOrColoring = new PullPipe<>(pullLighting);
         } else {
-            // 5. TODO perform projection transformation
+            afterLightingOrColoring = new PullPipe<>(pullModelColor);
         }
 
-        // TODO 6. perform perspective division to screen coordinates
+        // 5. perform projection transformation
+        PullProjectionTransformation<Pair<Face, Color>> pullProjectionTransformation = new PullProjectionTransformation<>(pd, afterLightingOrColoring);
+        PullPipe<Pair<Face, Color>> afterProjectTransformationPipe = new PullPipe<>(pullProjectionTransformation);
 
-        // TODO 7. feed into the sink (renderer)
+        // 6. perform perspective division to screen coordinates
+        PullScreenSpaceTransformation<Pair<Face, Color>> pullScreenSpaceTransformation = new PullScreenSpaceTransformation<>(pd, afterProjectTransformationPipe);
+        PullPipe<Pair<Face, Color>> afterScreenSpaceTransformation = new PullPipe<>(pullScreenSpaceTransformation);
+
+        // 7. feed into the sink (renderer)
+        PullRenderer<Pair<Face, Color>> pullRenderer = new PullRenderer<>(pd, afterScreenSpaceTransformation);
 
         // returning an animation renderer which handles clearing of the
         // viewport and computation of the praction
         return new AnimationRenderer(pd) {
 
-            // TODO - done - rotation variable goes in here
+            // rotation variable goes in here
             float totalRotation = 0;
 
             /** This method is called for every frame from the JavaFX Animation
@@ -68,44 +69,21 @@ public class PullPipelineFactory {
             @Override
             protected void render(float fraction, Model model) {
 
-                // TODO - done -  compute rotation in radians
+                // compute rotation in radians
                 totalRotation += fraction;
                 double rad = totalRotation % (2 * Math.PI);
 
-                // TODO - done - create new model rotation matrix using pd.getModelRotAxis and Matrices.rotate
-                var rotationMatix = Matrices.rotate((float) rad, pd.getModelRotAxis());
+                // create new model rotation matrix using pd.getModelRotAxis and Matrices.rotate
+                var rotationMatrix = Matrices.rotate((float) rad, pd.getModelRotAxis());
 
-                // TODO - done - compute updated model-view tranformation
-                pullModelRotationFilter.updateRotationMatrix(rotationMatix);
+                // compute updated model-view tranformation
+                pullModelViewTransformationFilter.updateRotationMatrix(rotationMatrix);
 
-                // TODO update model-view filter
-                // i guess it works not like that in our project?
-
-                // TODO - done - trigger rendering of the pipeline
+                // update model-view filter
                 source.setSourceData(model.getFaces());
 
-                // yup that needs to be in a filter, we know
-                while(pullModelColor.hasNext()) {
-
-                    Pair<Face, Color> pair = pullModelColor.pull();
-                    Color color = pair.snd();
-                    pd.getGraphicsContext().setStroke(color);
-                    pd.getGraphicsContext().setFill(color);
-
-                    Face f = pair.fst();
-                    var cordX = new double[]{ f.getV1().getX(), f.getV2().getX(), f.getV3().getX() };
-                    var cordY = new double[]{ f.getV1().getY(), f.getV2().getY(), f.getV3().getY() };
-
-                    var ctx = pd.getGraphicsContext();
-                    switch ((pd.getRenderingMode())) {
-                        case POINT -> ctx.fillOval(cordX[0], cordY[0], 2, 2);
-                        case WIREFRAME -> ctx.strokePolygon(cordX, cordY, 3);
-                        case FILLED -> {
-                            ctx.fillPolygon(cordX, cordY, 3);
-                            ctx.strokePolygon(cordX, cordY, 3);
-                        }
-                    }
-                }
+                // trigger rendering of the pipeline
+                pullRenderer.doRender();
 
             }
         };

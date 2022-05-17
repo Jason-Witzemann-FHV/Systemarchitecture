@@ -10,18 +10,24 @@ import javafx.scene.paint.Color;
 /**
  * maps face to itself and its corresponding color
  */
-public class PullModelColor<T extends Face> extends Pull<T, Pair<Face, Color>> {
+public class PullLighting<T extends Pair<Face, Color>> extends Pull<T, Pair<Face, Color>> {
 
     private final PipelineData pd;
 
-    public PullModelColor(PipelineData pd, IPull<T> source) {
+    public PullLighting(PipelineData pd, IPull<T> source) {
         super(source);
         this.pd = pd;
     }
 
     @Override
     public Pair<Face, Color> pull() {
-        Face f = source.pull();
-        return new Pair<>(f, pd.getModelColor());
+        return applyLighting(source.pull());
+    }
+
+    private Pair<Face, Color> applyLighting(Pair<Face, Color> pair) {
+        Face f = pair.fst();
+        Color c = pair.snd();
+        float shading = f.getN1().toVec3().dot(pd.getLightPos().getUnitVector());
+        return new Pair<>(f, c.deriveColor(0, 1, shading, 1));
     }
 }
