@@ -22,6 +22,7 @@ public class PullSource extends Pull<Face, Face>{
         return sourceData.poll();
     }
 
+    @Override
     public boolean hasNext() {
         return !sourceData.isEmpty();
     }

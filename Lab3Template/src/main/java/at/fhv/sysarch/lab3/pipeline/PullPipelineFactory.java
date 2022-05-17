@@ -54,7 +54,7 @@ public class PullPipelineFactory {
 
                 source.setSourceData(model.getFaces());
                 pd.getGraphicsContext().setStroke(Color.YELLOW);
-                while(source.hasNext()) {
+                while(pullViewTransformation.hasNext()) {
                     Face f = pullViewTransformation.pull();
                     pd.getGraphicsContext().strokeLine(f.getV1().getX(), f.getV1().getY(), f.getV1().getX(), f.getV1().getY());
                     pd.getGraphicsContext().strokeLine(f.getV2().getX(), f.getV2().getY(), f.getV2().getX(), f.getV2().getY());

@@ -9,4 +9,9 @@ public abstract class Pull<T, R> implements IPull<R> {
     protected Pull(IPull<T> source) {
         this.source = source;
     }
+
+    @Override
+    public boolean hasNext() {
+        return source.hasNext();
+    }
 }

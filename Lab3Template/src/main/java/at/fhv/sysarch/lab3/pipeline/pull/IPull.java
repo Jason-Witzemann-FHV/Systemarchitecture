@@ -7,4 +7,6 @@ public interface IPull<R> {
 
     R pull();
 
+    boolean hasNext();
+
 }
