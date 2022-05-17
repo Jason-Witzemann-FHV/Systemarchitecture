@@ -21,7 +21,7 @@ public class PullViewTransformation <T extends Face> extends Pull<T, Face> {
         Vec4 factor = new Vec4(
                 400,
                 400,
-                0,
+                1000,
                 0
         );
         return new Face(
