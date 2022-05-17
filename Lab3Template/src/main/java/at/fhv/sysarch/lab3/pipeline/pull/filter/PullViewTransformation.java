@@ -1,10 +1,12 @@
-package at.fhv.sysarch.lab3.pipeline.pull;
+package at.fhv.sysarch.lab3.pipeline.pull.filter;
 
 import at.fhv.sysarch.lab3.obj.Face;
+import at.fhv.sysarch.lab3.pipeline.pull.IPull;
+import at.fhv.sysarch.lab3.pipeline.pull.Pull;
 import com.hackoeur.jglm.Vec4;
 
 // idk, moving i guess
-public class PullViewTransformation <T extends Face> extends Pull<T, Face>{
+public class PullViewTransformation <T extends Face> extends Pull<T, Face> {
     public PullViewTransformation(IPull<T> source) {
         super(source);
     }

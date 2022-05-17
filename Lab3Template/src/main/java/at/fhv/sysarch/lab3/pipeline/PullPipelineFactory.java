@@ -4,6 +4,8 @@ import at.fhv.sysarch.lab3.animation.AnimationRenderer;
 import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.obj.Model;
 import at.fhv.sysarch.lab3.pipeline.pull.*;
+import at.fhv.sysarch.lab3.pipeline.pull.filter.PullModelTransformation;
+import at.fhv.sysarch.lab3.pipeline.pull.filter.PullViewTransformation;
 import javafx.animation.AnimationTimer;
 import javafx.scene.paint.Color;
 
@@ -21,6 +23,8 @@ public class PullPipelineFactory {
         PullViewTransformation pullViewTransformation = new PullViewTransformation(toViewTransformation);
 
         // TODO 2. perform backface culling in VIEW SPACE
+
+
 
         // TODO 3. perform depth sorting in VIEW SPACE
 
