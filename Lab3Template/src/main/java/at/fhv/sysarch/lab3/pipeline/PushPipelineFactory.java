@@ -4,27 +4,25 @@ import at.fhv.sysarch.lab3.animation.AnimationRenderer;
 import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.obj.Model;
 import at.fhv.sysarch.lab3.pipeline.data.Pair;
+import at.fhv.sysarch.lab3.pipeline.push.PushPipe;
+import at.fhv.sysarch.lab3.pipeline.push.filter.PushModelViewTransformation;
+import at.fhv.sysarch.lab3.pipeline.push.filter.PushRenderer;
+import at.fhv.sysarch.lab3.pipeline.push.PushSource;
 import javafx.animation.AnimationTimer;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 public class PushPipelineFactory {
     public static AnimationTimer createPipeline(PipelineData pd) {
+        PushRenderer sink = new PushRenderer(pd.getGraphicsContext(), pd.getRenderingMode());
+        PushPipe<Pair<Face, Color>> toDebug = new PushPipe<>(sink);
+
+        PushPipe<Face> toBackFaceCulling = new PushPipe<>();
+        PushModelViewTransformation pushModelViewTransformation = new PushModelViewTransformation(toDebug,pd.getViewTransform(),pd.getModelTranslation())
+        PushSource source = new PushSource(toDebug);
+
         // TODO: push from the source (model)
 
         // TODO: the connection of filters and pipes requires a lot of boilerplate code. Think about options how this can be minimized
-        IFilter source = new ModelSource<Model>();
-        IFilter filter = new ModelFilter();
-        IFilter sink = new Renderer(pd.getGraphicsContext(), pd.getRenderingMode());
-        Pipe pipe = new Pipe();
-        pipe.setSuccessor(filter);
-        source.setPipeSuccessor(pipe);
-
-        Pipe toSink = new Pipe();
-        toSink.setSuccessor(sink);
-        filter.setPipeSuccessor(toSink);
 
         // TODO 1. perform model-view transformation from model to VIEW SPACE coordinates
 
@@ -61,6 +59,7 @@ public class PushPipelineFactory {
              */
             @Override
             protected void render(float fraction, Model model) {
+                source.setSourceData(model.getFaces());
                 // TODO compute rotation in radians
 
                 // TODO create new model rotation matrix using pd.modelRotAxis
@@ -71,12 +70,6 @@ public class PushPipelineFactory {
 
                 // TODO trigger rendering of the pipeline
 
-                // line
-                pd.getGraphicsContext().setStroke(Color.PINK);
-                pd.getGraphicsContext().strokeLine(0+pos,0+pos,100+pos,100+pos);
-                pos++;
-
-                source.write(model);
             }
         };
     }

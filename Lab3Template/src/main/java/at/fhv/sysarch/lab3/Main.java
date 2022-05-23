@@ -20,13 +20,13 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-    private final static int VIEW_WIDTH  = 860;
-    private final static int VIEW_HEIGHT = 540;
+    private final static int VIEW_WIDTH  = 430;
+    private final static int VIEW_HEIGHT = 270;
 
     private final static int SCENE_WIDTH  = VIEW_WIDTH * 2;
     private final static int SCENE_HEIGHT = VIEW_HEIGHT * 2;
 
-    private final static boolean USE_PUSH_PIPELINE = false;
+    private final static boolean USE_PUSH_PIPELINE = true;
     
     @Override
     public void start(Stage stage) throws IOException {

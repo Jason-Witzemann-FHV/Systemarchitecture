@@ -19,6 +19,10 @@ repositories {
     mavenCentral()
 }
 
+java {
+    sourceCompatibility = '17'
+}
+
 javafx {
     version = "11"
     modules = [ 'javafx.controls' ]
