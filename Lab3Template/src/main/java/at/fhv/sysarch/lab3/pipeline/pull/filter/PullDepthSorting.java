@@ -36,7 +36,4 @@ public class PullDepthSorting<T extends Face> extends Pull<T, Face> {
         }
         sortedFaces.sort(Comparator.comparing(face -> face.getV1().getZ() + face.getV2().getZ() + face.getV3().getZ()));
     }
-
-
-
 }

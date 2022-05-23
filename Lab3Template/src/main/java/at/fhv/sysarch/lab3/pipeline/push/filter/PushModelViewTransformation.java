@@ -11,7 +11,7 @@ public class PushModelViewTransformation extends Push<Face, Face> {
     private final Mat4 modelTranslation;
     private Mat4 rotationMatrix;
 
-    protected PushModelViewTransformation(IPush<Face> successor, Mat4 viewTransform, Mat4 modelTranslation) {
+    public PushModelViewTransformation(IPush<Face> successor, Mat4 viewTransform, Mat4 modelTranslation) {
         super(successor);
         this.modelTranslation = modelTranslation;
         this.viewTransform = viewTransform;

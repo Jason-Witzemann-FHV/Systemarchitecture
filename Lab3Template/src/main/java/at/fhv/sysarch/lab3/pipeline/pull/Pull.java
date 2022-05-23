@@ -2,11 +2,11 @@ package at.fhv.sysarch.lab3.pipeline.pull;
 // T        ... Input of Element
 // R        ... Output of Element
 // source   ... Previous Element
-public abstract class Pull<T, R> implements IPull<R> {
+public abstract class Pull<I, O> implements IPull<O> {
 
-    protected final IPull<T> source;
+    protected final IPull<I> source;
 
-    protected Pull(IPull<T> source) {
+    protected Pull(IPull<I> source) {
         this.source = source;
     }
 

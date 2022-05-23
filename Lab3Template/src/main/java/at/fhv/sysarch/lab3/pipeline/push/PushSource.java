@@ -9,10 +9,10 @@ import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
 
-public class PushSource extends Push<Face, Pair<Face, Color>> {
+public class PushSource extends Push<Face, Face> {
     private Queue<Face> sourceData = new ArrayDeque<>();
 
-    public PushSource(IPush<Pair<Face, Color>> successor) {
+    public PushSource(IPush<Face> successor) {
         super(successor);
     }
 
@@ -27,7 +27,7 @@ public class PushSource extends Push<Face, Pair<Face, Color>> {
                 dummyData,
                 dummyData));
         while (!this.sourceData.isEmpty()) {
-            successor.push(new Pair<>(this.sourceData.poll(), Color.YELLOW));
+            successor.push(this.sourceData.poll());
         }
     }
 
