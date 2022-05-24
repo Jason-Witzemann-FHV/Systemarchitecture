@@ -295,3 +295,11 @@ The push pipeline can be a bit more challenging (at least if you follow our guid
 <img src="https://user-images.githubusercontent.com/86053522/170132785-40d3d60b-6ca5-4632-9da9-84620d9dbe08.png"/>
 
 > push pipeline classes
+
+An overview of what filters you need in this exercises is displayed in the description of the pull pipeline.
+
+### How to start the project
+
+You can start this project by either running `gradle run` in the `Lab3Template` folder or by starting the `main` method in the `Lab3Template/src/main/java/at/fhv/sysarch/lab3/StartProject.java`class.
+If the application does not fit your screen size, you can adjust it by adjusting the values of `VIEW_WIDTH` and / or `VIEW_HEIGHT` field in the `Lab3Template/src/main/java/at/fhv/sysarch/lab3/Main.java` class.
+You can swap between the **Push* and **Pull** pipeline by setting the `USE_PUSH_PIPELINE` flag `true` or `false` 
