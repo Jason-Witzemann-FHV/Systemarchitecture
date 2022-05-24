@@ -248,11 +248,11 @@ Now think about what your pipeline has to do. In a Pull pipeline, each pipe and 
 
 | | What we implemented | Why we did it |
 |-|-|-|
-| Interface | A method `public T pull()`. T is the generic type of what the Element (Filter or Pipe) *outputs*. We also have a `public boolean hasNext()` method. | The `pull()` method will be called by the successor to get the output of the element. Sometimes (e.g. in DepthSorting) we need to have all previous Faces to sort them. This is why we also implemented the `hasNext()` method. |
+| Interface | A method `public T pull()`. T is the generic type of what the element (Filter or Pipe) *outputs*. We also have a `public boolean hasNext()` method. | The `pull()` method will be called by the successor to get the output of the element. Sometimes (e.g. in DepthSorting) we need to have all previous Faces to sort them. This is why we also implemented the `hasNext()` method. |
 | Abstract class | Implements the interface with generic `O` and also has a `source` with generic `I`. The standard implementation for `hasNext()` is `source.hasNext()` | Each pipeline element has to pull the predecessor's element (Face, Pair). Therefore, each pipeline element has to have at least a source, that is given in the constructor. The generic `I` stands for the input into the element, which is the output of its predecessor. And also each element has to output another element, which is displayed with the generic `O`. | 
 
 By now our abstract class has all the common information it needs to start implementing our Pipes and Filters. 
-Because this project doesn't need any pipe logic, we created a general, generic pipe class with an implemented `pull()` logic of `source.pull()`. Because it is a pipeline, where data will not be transformed, our input and output elements are of the same class. 
+Because this project doesn't need any pipe logic, we created a general, generic pipe class with an implemented `pull()` logic of `source.pull()`. Because it is a pipeline, where data will not be transformed, our input and output elements are of the same type. 
 
 After our interface, abstract class and pipe, we can start with our filter logic.
 
@@ -262,6 +262,36 @@ After our interface, abstract class and pipe, we can start with our filter logic
 
 We will not cover the required filters or rendering logic behind the pipeline, but we provide a class diagram of our pipeline elements and how they relate to each other.
 
-<img src="https://user-images.githubusercontent.com/86053522/170071614-4dd03b42-5466-4923-9ae4-9c62a2702b50.png"/>
+<img src="https://user-images.githubusercontent.com/86053522/170132940-8765eefa-5234-4628-bf61-90e49f9bdb6b.png"/>
 
 > pull pipeline classes
+
+We then connect the filters with a pipe to match the instructions workflow like this:
+
+<img src="https://user-images.githubusercontent.com/86053522/170127256-c2296b82-983d-4234-91dd-65b3bdd45bef.png"/>
+
+> Lab exercise instructions
+
+By now, you should have a grasp of how the pipeline works. Implementing a second pipeline is rather simple, with the same approach. We have a *Push pipeline* which *pushes* elements to its *successor*. We therefore, again, implemented an interface and an abstract class
+
+| | What we implemented | Why we did it |
+|-|-|-|
+| Interface | A method `public void push(E element)`. `E` is the generic type of what the element that is pushed into the class is based on (aka the *Input*) | We don't need a `hasNext()` logic in this pipeline, because we actively push our elements to the successor. |
+| Abstract class | Implements the interface with generic `T` and also has a `source` with generic `N`. `T` stands for the type of element that is used in **T**his class, `N` is the type of element that is used in the **N**ext part of the pipeline. | Each pipeline element has to push to the successor. Therefore, each pipeline element has to have at least a successor, that is given in the constructor. | 
+
+By now our abstract class has all the common information it needs to start implementing our Pipes and Filters. 
+Because this project doesn't need any pipe logic, we, again, created a general, generic pipe class with an implemented `push(E element)` logic of `successor.push(element)`. Because it is a pipeline, where data will not be transformed, our input and output elements are of the same type. 
+
+
+After our interface, abstract class and pipe, we can start with our filter logic.
+
+0. We have to indicate some filters that there are no more elements being pushed (e.g. for DepthSorting). We could do this by a `hasNext()` logic, but we decided it would be easier to add a custom Face with specific values, that acts as a Flag-Face. We add this specific Face to the source class
+1. The source class is the root of our data. Other than the specific value that is added in `0.`, we don't have a specific logic here
+2. The sink is interesting in the push pipeline, as it has no successor. Therefore we construct it with `successor = null`. The `push()` methods does not work here, as this is the place where we render our faces. 
+3. Now we gradually implement our filters, connect them with a pipe and view the progress by starting our application. With each filter, our Utah teapot comes a step closer to completion
+
+The push pipeline can be a bit more challenging (at least if you follow our guide). You can see in the code, that our pipeline is somewhat upside-down. This is, because we have to create the sink so that we can pass it to its predecessor as a successor.
+
+<img src="https://user-images.githubusercontent.com/86053522/170132785-40d3d60b-6ca5-4632-9da9-84620d9dbe08.png"/>
+
+> push pipeline classes
