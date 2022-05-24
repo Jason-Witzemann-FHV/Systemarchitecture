@@ -2,7 +2,7 @@
 This repository is a collection of different Systemarchitectures lectured at the FHV in summer semester 2022. It consists of:
 * Lab Exercise **[Command Query Responsibility Segregation](#CQRS) + [Event Sourcing](#ES) for a [Hotel Management Software](#Lab1)**
 * Lab Exercise **[Actors](#Actor) for an [automated home](#Lab2)**
-* Lab Exercise **Pipes & Filters Utah Teapot**
+* Lab Exercise **[Pipes & Filters](#Paf) [Utah Teapot](#Lab3)**
 * Lab Exercise Game **2D Pool with Java Physics Engine and JavaFX** (Maybe a game engine too)
 
 <a name="CQRS"/>
@@ -234,3 +234,32 @@ To get more infos about the commands, just type `temp`, `media` or `fridge`. Her
     * beer
 
 - - - -
+
+
+<a name="Paf" />
+
+<a name="Lab3" />
+
+## Utah Teapot
+### Where to start
+
+We have to implement a *Push pipeline* and a *Pull pipeline*, therefore choose one of them to begin with. In this example, we started with the Pull pipeline. The following section will demonstrate how to implement a Pull pipeline, the Push pipeline will be covered later in the read.me.
+Now think about what your pipeline has to do. In a Pull pipeline, each pipe and filter has to **pull** the data from a **source**. Therefore, we decided to create an interface and an abstract class.
+
+| | What we implemented | Why we did it |
+|-|-|-|
+| Interface | A method `public T pull()`. T is the generic type of what the Element (Filter or Pipe) *outputs*. We also have a `public boolean hasNext()` method. | The `pull()` method will be called by the successor to get the output of the element. Sometimes (e.g. in DepthSorting) we need to have all previous Faces to sort them. This is why we also implemented the `hasNext()` method. |
+| Abstract class | Implements the interface with generic `O` and also has a `source` with generic `I`. The standard implementation for `hasNext()` is `source.hasNext()` | Each pipeline element has to pull the predecessor's element (Face, Pair). Therefore, each pipeline element has to have at least a source, that is given in the constructor. The generic `I` stands for the input into the element, which is the output of its predecessor. And also each element has to output another element, which is displayed with the generic `O`. | 
+
+By now our abstract class has all the common information it needs to start implementing our Pipes and Filters. 
+Because this project doesn't need any pipe logic, we created a general, generic pipe class with an implemented `pull()` logic of `source.pull()`. Because it is a pipeline, where data will not be transformed, our input and output elements are of the same class. 
+
+After our interface, abstract class and pipe, we can start with our filter logic.
+
+1. We start off with our data source, as this is not a common filter, we have to change our `source` property to `null` and change our pull logic, as it is not pulling from its predecessor (because there is none).
+2. We then continue with the sink (aka Renderer), as this is the end of our pipeline, which will draw our Utah teapot. We have to implement a render logic and overwrite our `pull()` method.
+3. Now we gradually implement our filters, connect them with a pipe and view the progress by starting our application. With each filter, our Utah teapot comes a step closer to completion
+
+We will not cover the required filters or rendering logic behind the pipeline, but we provide a class diagram of our pipeline elements and how they relate to each other.
+
+> pull pipeline classes
