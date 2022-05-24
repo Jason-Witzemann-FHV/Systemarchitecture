@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Queue;
 
 public class PullSource extends Pull<Face, Face>{
-    private Queue<Face> sourceData = new ArrayDeque<>();
+    private final Queue<Face> sourceData = new ArrayDeque<>();
 
     public PullSource() {
         super(null);

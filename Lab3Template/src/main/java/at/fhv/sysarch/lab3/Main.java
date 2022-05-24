@@ -26,7 +26,7 @@ public class Main extends Application {
     private final static int SCENE_WIDTH  = VIEW_WIDTH * 2;
     private final static int SCENE_HEIGHT = VIEW_HEIGHT * 2;
 
-    private final static boolean USE_PUSH_PIPELINE = false;
+    private final static boolean USE_PUSH_PIPELINE = true;
     
     @Override
     public void start(Stage stage) throws IOException {
