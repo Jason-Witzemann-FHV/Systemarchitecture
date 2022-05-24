@@ -262,4 +262,6 @@ After our interface, abstract class and pipe, we can start with our filter logic
 
 We will not cover the required filters or rendering logic behind the pipeline, but we provide a class diagram of our pipeline elements and how they relate to each other.
 
+<img src="https://user-images.githubusercontent.com/86053522/170071614-4dd03b42-5466-4923-9ae4-9c62a2702b50.png"/>
+
 > pull pipeline classes
