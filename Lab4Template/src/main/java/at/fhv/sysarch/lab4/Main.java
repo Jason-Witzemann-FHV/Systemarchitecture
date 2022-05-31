@@ -11,14 +11,14 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-    private final static int SCENE_WIDTH  = 1920;
-    private final static int SCENE_HEIGHT = 1080;
+    private static final int SCENE_WIDTH  = 1920;
+    private static final  int SCENE_HEIGHT = 1080;
 
     @Override
     public void start(Stage stage) {
         final Group root = new Group();
         final Scene s = new Scene(root, SCENE_WIDTH, SCENE_HEIGHT, Color.BURLYWOOD);
-        final Canvas c = new Canvas(SCENE_WIDTH, SCENE_WIDTH);
+        final Canvas c = new Canvas(SCENE_WIDTH, SCENE_HEIGHT);//falls was ne tuat muss rechts SCENE_WIDTH ahne
 
         Physics physics = new Physics();
 
