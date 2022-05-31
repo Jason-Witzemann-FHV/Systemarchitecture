@@ -39,17 +39,23 @@ public class Game {
             if(results.get(0).getBody().getUserData() instanceof Ball)
                 results.get(0).getBody().applyForce(new Vector2(1, 0).multiply(750));
         }
+
+        this.renderer.setCueStart(x, y);
     }
 
     public void onMouseReleased(MouseEvent e) {
+        this.renderer.releaseCue();
     }
 
     public void setOnMouseDragged(MouseEvent e) {
+
         double x = e.getX();
         double y = e.getY();
 
         double pX = renderer.screenToPhysicsX(x);
         double pY = renderer.screenToPhysicsY(y);
+
+        this.renderer.setCueEnd(x, y);
     }
 
     private void placeBalls(List<Ball> balls) {

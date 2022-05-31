@@ -3,6 +3,7 @@ package at.fhv.sysarch.lab4.rendering;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 
 import at.fhv.sysarch.lab4.physics.Physics;
 import org.dyn4j.dynamics.BodyFixture;
@@ -112,6 +113,24 @@ public class Renderer extends AnimationTimer {
     public void setFrameListener(FrameListener l) {
         this.frameListener = Optional.of(l);
     }
+
+    public void setCueStart(double x, double y) {
+        cueStartX = OptionalDouble.of(x);
+        cueStartY = OptionalDouble.of(y);
+    }
+
+    public void setCueEnd(double x, double y) {
+        cueEndX = OptionalDouble.of(x);
+        cueEndY = OptionalDouble.of(y);
+    }
+
+    public void releaseCue() {
+        cueStartX = OptionalDouble.empty();
+        cueStartY = OptionalDouble.empty();
+        cueEndX = OptionalDouble.empty();
+        cueEndY = OptionalDouble.empty();
+    }
+
 
     public double screenToPhysicsX(double screenX) {
         // screen has origin (0/0) top left corner,
@@ -231,8 +250,19 @@ public class Renderer extends AnimationTimer {
         }
     }
 
+
+    private OptionalDouble cueStartX = OptionalDouble.empty();
+    private OptionalDouble cueStartY = OptionalDouble.empty();
+    private OptionalDouble cueEndX = OptionalDouble.empty();
+    private OptionalDouble cueEndY = OptionalDouble.empty();
+
     private void drawCue() {
-        // TODO: draw cue
+        if (cueEndX.isPresent()) {
+            this.gc.setTransform(this.jfxCoords); // if we use poolCords we have to set pX/pY Coords and multiply them with scale. With jfx Coords we can use the "renderer" coords (center top left) and there is no need to multiply values with scale
+            this.gc.setFill(Color.BLACK);
+            this.gc.setLineWidth(2);
+            this.gc.strokeLine(cueStartX.getAsDouble(), cueStartY.getAsDouble(), cueEndX.getAsDouble(), cueEndY.getAsDouble());
+        }
     }
 
     private void drawFPS(double dt) {
