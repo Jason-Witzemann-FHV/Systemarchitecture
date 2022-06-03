@@ -1,5 +1,7 @@
 package at.fhv.sysarch.lab4.physics;
 
+import at.fhv.sysarch.lab4.game.Ball;
+import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.Step;
 import org.dyn4j.dynamics.StepListener;
 import org.dyn4j.dynamics.World;
@@ -12,6 +14,8 @@ public class Physics implements ContactListener, StepListener {
 
     private World world;
 
+    private BallPocketedListener pocketedListener;
+
     public Physics() {
         this.world = new World();
         this.world.setGravity(World.ZERO_GRAVITY);
@@ -20,6 +24,10 @@ public class Physics implements ContactListener, StepListener {
 
     public World getWorld() {
         return world;
+    }
+
+    public void setPocketedListener(BallPocketedListener pocketedListener) {
+        this.pocketedListener = pocketedListener;
     }
 
     @Override
@@ -60,6 +68,26 @@ public class Physics implements ContactListener, StepListener {
 
     @Override
     public boolean persist(PersistedContactPoint point) {
+        if(point.isSensor()) {
+            var body1 = point.getBody1();
+            var body2 = point.getBody2();
+
+            Body ball;
+            Body pocket;
+
+            if (body1.getUserData() instanceof Ball) {
+                ball = body1;
+                pocket = body2;
+            } else {
+                ball = body2;
+                pocket = body1;
+            }
+
+            if (pocket.contains(ball.getWorldCenter())) {
+                pocketedListener.onBallPocketed((Ball) ball.getUserData());
+                world.removeBody(ball);
+            }
+        }
         return true;
     }
 

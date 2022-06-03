@@ -37,7 +37,7 @@ public class Main extends Application {
         stage.setScene(s);
         stage.setTitle("Billiard Game");
         stage.show();
-
+        
         renderer.start();
     }
 
