@@ -33,7 +33,7 @@ public class Renderer extends AnimationTimer {
     private final double sceneWidth;
     private final double sceneHeight;
 
-    private final static double SCALE = 400;
+    private static final double SCALE = 400;
 
     private final Affine poolCoords;
     private final Affine jfxCoords;
@@ -58,8 +58,8 @@ public class Renderer extends AnimationTimer {
         this.physics = physics;
         this.balls = new ArrayList<>();
         
-        this.centerX = (double) sceneWidth * 0.5;
-        this.centerY = (double) sceneHeight * 0.5;
+        this.centerX = sceneWidth * 0.5;
+        this.centerY = sceneHeight * 0.5;
         this.sceneWidth = sceneWidth;
         this.sceneHeight = sceneHeight;
         
@@ -76,6 +76,7 @@ public class Renderer extends AnimationTimer {
         this.jfxCoords = new Affine();
 
         this.gc.setStroke(Color.WHITE);
+        this.cueColor = Color.BLACK;
     }
 
     public void setStrikeMessage(String strikeMessage) {
@@ -156,7 +157,7 @@ public class Renderer extends AnimationTimer {
 
     @Override
     public void handle(long now) {
-        double dt = (double) (now - lastUpdate) / 1000_000_000.0;
+        double dt = (now - lastUpdate) / 1000_000_000.0;
 
         this.physics.getWorld().update(dt);
         this.frameListener.ifPresent(l -> l.onFrame(dt));
@@ -192,13 +193,10 @@ public class Renderer extends AnimationTimer {
         for (BodyFixture f : fs) {
             TablePart tp = (TablePart) f.getUserData();
 
-            switch (tp) {
-                case POCKET:
-                    this.renderPocket((Circle) f.getShape());
-                    break;
-                case CUSHION:
-                    this.renderCushion((Polygon) f.getShape());
-                    break;
+            if (tp == TablePart.POCKET) {
+                this.renderPocket((Circle) f.getShape());
+            } else if (tp == TablePart.CUSHION) {
+                this.renderCushion((Polygon) f.getShape());
             }
         }
     }
@@ -234,7 +232,7 @@ public class Renderer extends AnimationTimer {
                 continue;
             }
 
-            if (false == b.isSolid()) {
+            if (!b.isSolid()) {
                 this.gc.setFill(Color.WHITE);
                 this.gc.fillArc(-r * 0.75, -r * 0.95, d * 0.75, r * 0.75, 0, 180, ArcType.ROUND);
                 this.gc.fillArc(-r * 0.75, r * 0.2, d * 0.75, r * 0.75, 180, 180, ArcType.ROUND);
@@ -256,10 +254,14 @@ public class Renderer extends AnimationTimer {
     private OptionalDouble cueEndX = OptionalDouble.empty();
     private OptionalDouble cueEndY = OptionalDouble.empty();
 
+    private Color cueColor;
+
+    public void setCueColor(Color color) { this.cueColor = color;}
+
     private void drawCue() {
         if (cueEndX.isPresent()) {
             this.gc.setTransform(this.jfxCoords); // if we use poolCords we have to set pX/pY Coords and multiply them with scale. With jfx Coords we can use the "renderer" coords (center top left) and there is no need to multiply values with scale
-            this.gc.setFill(Color.BLACK);
+            this.gc.setStroke(cueColor);
             this.gc.setLineWidth(2);
             this.gc.strokeLine(cueStartX.getAsDouble(), cueStartY.getAsDouble(), cueEndX.getAsDouble(), cueEndY.getAsDouble());
         }
