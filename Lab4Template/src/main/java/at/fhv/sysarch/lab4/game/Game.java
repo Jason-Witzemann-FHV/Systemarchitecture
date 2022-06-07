@@ -71,35 +71,23 @@ public class Game implements BallPocketedListener, BallsRestListener, BallsColli
             double y = e.getY();
             double cueEndX = this.renderer.screenToPhysicsX(x);
             double cueEndY = this.renderer.screenToPhysicsY(y);
-            Vector2 startPoint = new Vector2(cueStartX, cueStartY);
-            Vector2 direction = new Vector2(cueStartX - cueEndX, cueStartY- cueEndY);
 
-            // Ray must have a direction
-            if (!direction.equals(new Vector2(0,0))) {
-
-                // cast Ray
-                Ray ray = new Ray(startPoint, direction);
-                ArrayList<RaycastResult> results = new ArrayList<>();
-                this.physics.getWorld().raycast(ray, 0.2, false, true, results);
-
-                // Evaluate results
-                var hitBall = results.stream().filter(o -> o.getBody().getUserData() instanceof Ball).findFirst();
-                if(hitBall.isPresent()) {
-                    // Ball got hit
-                    turnIsActive = true;
-                    renderer.setStrikeMessage("Balls are moving...");
-                    renderer.setCueColor(Color.RED);
-                    var ball = hitBall.get().getBody();
-                    Ball checkWhite = (Ball) ball.getUserData();
-                    if (!checkWhite.isWhite()) {
-                        foul("Only hit the white ball");
-                    }
-                    double dx = cueStartX - cueEndX;
-                    double dy = cueStartY - cueEndY;
-                    double strength = Math.min(Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)) * 1000, 400);
-                    ball.applyForce(new Vector2(dx, dy).multiply(strength));
+            // Evaluate results
+            List<RaycastResult> results = physics.strike(cueStartX, cueStartY, cueEndX, cueEndY);
+            var hitBall = results.stream().filter(o -> o.getBody().getUserData() instanceof Ball).findFirst();
+            if(hitBall.isPresent()) {
+                // Ball got hit
+                turnIsActive = true;
+                renderer.setStrikeMessage("Balls are moving...");
+                renderer.setCueColor(Color.RED);
+                var ball = hitBall.get().getBody();
+                Ball checkWhite = (Ball) ball.getUserData();
+                if (!checkWhite.isWhite()) {
+                    foul("Only hit the white ball");
                 }
+                physics.hitBall(ball, cueStartX, cueStartY, cueEndX, cueEndY);
             }
+
         }
     }
 
@@ -140,15 +128,7 @@ public class Game implements BallPocketedListener, BallsRestListener, BallsColli
     }
 
     private void initWorld() {
-        List<Ball> balls = new ArrayList<>();
-        
-        for (Ball b : Ball.values()) {
-            if (b == Ball.WHITE)
-                continue;
-            physics.getWorld().addBody(b.getBody());
-            balls.add(b);
-        }
-        this.placeBalls(balls);
+        generateBalls();
 
         Ball.WHITE.setPosition(Table.Constants.WIDTH * 0.25, 0);
         physics.getWorld().addBody(Ball.WHITE.getBody());
@@ -164,7 +144,7 @@ public class Game implements BallPocketedListener, BallsRestListener, BallsColli
         if (b.isWhite()) {
             //foul
             foul("White ball pocketed!");
-            whitePocketed = true;
+            foulOccured = true;
 
         } else if (!foulOccured){
             // get point
@@ -174,6 +154,38 @@ public class Game implements BallPocketedListener, BallsRestListener, BallsColli
         physics.getWorld().removeBody(b.getBody());
         renderer.removeBall(b);
         return true;
+    }
+
+    private void generateBalls() {
+        List<Ball> balls = new ArrayList<>();
+
+        for (Ball b : Ball.values()) {
+            if (b == Ball.WHITE)
+                continue;
+            physics.getWorld().addBody(b.getBody());
+            balls.add(b);
+        }
+        this.placeBalls(balls);
+    }
+
+    @Override
+    public boolean allBallsPocketed() {
+        generateBalls();
+        whiteToOrigin();
+        return true;
+    }
+
+    private void whiteToOrigin() {
+
+        Ball.WHITE.setPosition(Table.Constants.WIDTH * 0.25, 0);
+        Body white = Ball.WHITE.getBody();
+        white.setLinearVelocity(new Vector2(0,0));
+        if (physics.getWorld().containsBody(Ball.WHITE.getBody())) {
+            physics.getWorld().removeBody(Ball.WHITE.getBody());
+            renderer.removeBall(Ball.WHITE);
+        }
+        physics.getWorld().addBody(white);
+        renderer.addBall(Ball.WHITE);
     }
 
     @Override
@@ -186,17 +198,8 @@ public class Game implements BallPocketedListener, BallsRestListener, BallsColli
             // a foul occured
             renderer.setFoulMessage("");
             if(!ballsTouched) foul("Balls didn't touch");
+            if(foulOccured) whiteToOrigin();
             foulOccured = false;
-
-            // white pocketed
-            if (whitePocketed) {
-                Ball.WHITE.setPosition(Table.Constants.WIDTH * 0.25, 0);
-                Body white = Ball.WHITE.getBody();
-                white.setLinearVelocity(new Vector2(0,0));
-                physics.getWorld().addBody(white);
-                renderer.addBall(Ball.WHITE);
-                whitePocketed = false;
-            }
 
             // next player has the turn
             if (currentTurn == 1) {

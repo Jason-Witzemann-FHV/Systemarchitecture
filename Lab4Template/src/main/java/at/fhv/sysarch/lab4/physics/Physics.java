@@ -1,16 +1,17 @@
 package at.fhv.sysarch.lab4.physics;
 
 import at.fhv.sysarch.lab4.game.Ball;
-import org.dyn4j.dynamics.Body;
-import org.dyn4j.dynamics.Step;
-import org.dyn4j.dynamics.StepListener;
-import org.dyn4j.dynamics.World;
+import javafx.scene.paint.Color;
+import org.dyn4j.dynamics.*;
 import org.dyn4j.dynamics.contact.ContactListener;
 import org.dyn4j.dynamics.contact.ContactPoint;
 import org.dyn4j.dynamics.contact.PersistedContactPoint;
 import org.dyn4j.dynamics.contact.SolvedContactPoint;
+import org.dyn4j.geometry.Ray;
 import org.dyn4j.geometry.Vector2;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Physics implements ContactListener, StepListener {
@@ -69,6 +70,10 @@ public class Physics implements ContactListener, StepListener {
         );
         if (activeBalls.get() == world.getBodyCount()) {
             ballsRestListener.objectsAreResting();
+
+            if (world.getBodyCount() == 2) {
+                pocketedListener.allBallsPocketed();
+            }
         }
     }
 
@@ -125,5 +130,27 @@ public class Physics implements ContactListener, StepListener {
     @Override
     public void postSolve(SolvedContactPoint point) {
 
+    }
+
+    public List<RaycastResult> strike(double cueStartX, double cueStartY, double cueEndX, double cueEndY) {
+        Vector2 startPoint = new Vector2(cueStartX, cueStartY);
+        Vector2 direction = new Vector2(cueStartX - cueEndX, cueStartY- cueEndY);
+
+        ArrayList<RaycastResult> results = new ArrayList<>();
+        // Ray must have a direction
+        if (!direction.equals(new Vector2(0,0))) {
+
+            // cast Ray
+            Ray ray = new Ray(startPoint, direction);
+            world.raycast(ray, 0.2, false, true, results);
+        }
+        return results;
+    }
+
+    public void hitBall(Body ball, double cueStartX, double cueStartY, double cueEndX, double cueEndY) {
+        double dx = cueStartX - cueEndX;
+        double dy = cueStartY - cueEndY;
+        double strength = Math.min(Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)) * 1000, 400);
+        ball.applyForce(new Vector2(dx, dy).multiply(strength));
     }
 }
